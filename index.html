@@ -1,184 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>PEG Dilution Reference</title>
+  <meta charset="UTF-8">
+  <title>Dilution Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    input, select {
-      padding: 6px;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: center;
-    }
-    th {
+      font-family: 'Segoe UI', sans-serif;
       background: #f0f0f0;
-      cursor: pointer;
+      margin: 0;
+      padding: 20px;
     }
-    tr.category-row {
-      background: #e2e2e2;
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #4CAF50;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-left: 5px solid #4CAF50;
       font-weight: bold;
-    }
-    tr.hidden {
-      display: none;
+      font-size: 1.1em;
+      color: #333;
+      border-radius: 6px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>Dilution Calculator</h1>
 
-  <h1>PEG Dilution Reference</h1>
+    <label for="product">Product:</label>
+    <select id="product"></select>
 
-  <label for="search">Search Product:</label>
-  <input type="text" id="search" placeholder="e.g. Suma Multi D2" />
+    <label for="method">Application Method:</label>
+    <select id="method"></select>
 
-  <label for="categoryFilter">Filter by Category:</label>
-  <select id="categoryFilter">
-    <option value="All">All</option>
-    <option value="Kitchen Care">Kitchen Care</option>
-    <option value="Building Care">Building Care</option>
-    <option value="Floor Care">Floor Care</option>
-  </select>
+    <label for="pressure">Pressure:</label>
+    <select id="pressure"></select>
 
-  <table id="pegTable">
-    <thead>
-      <tr>
-        <th onclick="sortTable(0)">Product</th>
-        <th onclick="sortTable(1)">Trigger PEG</th>
-        <th onclick="sortTable(2)">Min</th>
-        <th onclick="sortTable(3)">Max</th>
-        <th onclick="sortTable(4)">Dilution %</th>
-        <th onclick="sortTable(5)">Bucket PEG</th>
-        <th onclick="sortTable(6)">Min</th>
-        <th onclick="sortTable(7)">Max</th>
-        <th onclick="sortTable(8)">Dilution %</th>
-      </tr>
-    </thead>
-    <tbody id="pegBody">
-      <!-- Kitchen Care -->
-      <tr class="category-row"><td colspan="9">Kitchen Care</td></tr>
-      <tr data-category="Kitchen Care">
-        <td>Suma Break up D3.5</td><td>K</td><td>2%</td><td>4%</td><td>–</td><td>I</td><td>0.8%</td><td>4%</td><td>–</td>
-      </tr>
-      <tr data-category="Kitchen Care">
-        <td>Suma Bac D10</td><td>M</td><td>1%</td><td>4%</td><td>–</td><td>K</td><td>0.8%</td><td>4%</td><td>–</td>
-      </tr>
-      <tr data-category="Kitchen Care">
-        <td>Suma Multi D2</td><td>K</td><td>0.5%</td><td>3%</td><td>–</td><td>M</td><td>0.5%</td><td>4%</td><td>–</td>
-      </tr>
-      <tr data-category="Kitchen Care">
-        <td>Suma Chlor D4.4</td><td>–</td><td>–</td><td>–</td><td>–</td><td>N</td><td>0.5%</td><td>0.8%</td><td>–</td>
-      </tr>
-      <tr data-category="Kitchen Care">
-        <td>Actival</td><td>–</td><td>–</td><td>–</td><td>–</td><td>N</td><td>0.5%</td><td>6%</td><td>–</td>
-      </tr>
-
-      <!-- Building Care -->
-      <tr class="category-row"><td colspan="9">Building Care</td></tr>
-      <tr data-category="Building Care">
-        <td>TASKI Sani 4 in 1</td><td>K</td><td>2.3%</td><td>2.9%</td><td>–</td><td>L</td><td>1%</td><td>2.8%</td><td>–</td>
-      </tr>
-      <tr data-category="Building Care">
-        <td>Goodsense Breakdown</td><td>K</td><td>2.5%</td><td>10%</td><td>–</td><td>H</td><td>2.8%</td><td>6.3%</td><td>–</td>
-      </tr>
-      <tr data-category="Building Care">
-        <td>TASKI Sprint 200</td><td>F</td><td>7.7%</td><td>10%</td><td>–</td><td>L</td><td>1%</td><td>10%</td><td>–</td>
-      </tr>
-      <tr data-category="Building Care">
-        <td>TASKI Sani 100</td><td>F</td><td>7.7%</td><td>10%</td><td>–</td><td>L</td><td>1%</td><td>10%</td><td>–</td>
-      </tr>
-
-      <!-- Floor Care -->
-      <tr class="category-row"><td colspan="9">Floor Care</td></tr>
-      <tr data-category="Floor Care">
-        <td>Jontec 300</td><td>F</td><td>5%</td><td>8%</td><td>–</td><td>N</td><td>0.4%</td><td>5%</td><td>–</td>
-      </tr>
-      <tr data-category="Floor Care">
-        <td>Jontec Tensol</td><td>F</td><td>5%</td><td>8%</td><td>–</td><td>N</td><td>0.4%</td><td>5%</td><td>–</td>
-      </tr>
-      <tr data-category="Floor Care">
-        <td>Jontec Best</td><td>–</td><td>–</td><td>–</td><td>–</td><td>N</td><td>0.4%</td><td>5%</td><td>–</td>
-      </tr>
-      <tr data-category="Floor Care">
-        <td>Jontec Forward</td><td>–</td><td>–</td><td>–</td><td>–</td><td>N</td><td>0.4%</td><td>10%</td><td>–</td>
-      </tr>
-    </tbody>
-  </table>
+    <div id="result">Select options to see result.</div>
+  </div>
 
   <script>
-    const searchInput = document.getElementById('search');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const tableRows = document.querySelectorAll('#pegBody tr');
+    const data = [
+      {Product:"Suma Break up D3.5", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"K", Dilution:2.5},
+      {Product:"Suma Break up D3.5", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"J", Dilution:3},
+      {Product:"Suma Break up D3.5", Method:"Bucket", Pressure:"1.5 bar", PEG:"I", Dilution:2},
+      {Product:"Suma Break up D3.5", Method:"Bucket", Pressure:"2.5 bar", PEG:"J", Dilution:2.5},
+      {Product:"Suma Bac D10", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"M", Dilution:1.5},
+      {Product:"Suma Bac D10", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"M", Dilution:1.5},
+      {Product:"Suma Bac D10", Method:"Bucket", Pressure:"1.5 bar", PEG:"K", Dilution:1},
+      {Product:"Suma Bac D10", Method:"Bucket", Pressure:"2.5 bar", PEG:"K", Dilution:1.3},
+      {Product:"Suma Multi D2", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"K", Dilution:2.5},
+      {Product:"Suma Multi D2", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"K", Dilution:2.5},
+      {Product:"Suma Multi D2", Method:"Bucket", Pressure:"1.5 bar", PEG:"N", Dilution:0.5},
+      {Product:"Suma Multi D2", Method:"Bucket", Pressure:"2.5 bar", PEG:"M", Dilution:0.6},
+      {Product:"Suma Chlor D4.4", Method:"Bucket", Pressure:"1.5 bar", PEG:"N", Dilution:0.4},
+      {Product:"Suma Chlor D4.4", Method:"Bucket", Pressure:"2.5 bar", PEG:"N", Dilution:0.6},
+      {Product:"Actival", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"Actival", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"TASKI Sani 4 in 1", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"K", Dilution:2.5},
+      {Product:"TASKI Sani 4 in 1", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"K", Dilution:2.5},
+      {Product:"TASKI Sani 4 in 1", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"TASKI Sani 4 in 1", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"Goodsense Breakdown", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"E", Dilution:10},
+      {Product:"Goodsense Breakdown", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"E", Dilution:10},
+      {Product:"Goodsense Breakdown", Method:"Bucket", Pressure:"1.5 bar", PEG:"J", Dilution:1.9},
+      {Product:"Goodsense Breakdown", Method:"Bucket", Pressure:"2.5 bar", PEG:"J", Dilution:1.9},
+      {Product:"TASKI Sprint 200", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"F", Dilution:7.7},
+      {Product:"TASKI Sprint 200", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"F", Dilution:8.3},
+      {Product:"TASKI Sprint 200", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"TASKI Sprint 200", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"TASKI Sani 100", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"F", Dilution:7.7},
+      {Product:"TASKI Sani 100", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"F", Dilution:8.3},
+      {Product:"TASKI Sani 100", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"TASKI Sani 100", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec 300", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"F", Dilution:8},
+      {Product:"Jontec 300", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"F", Dilution:8},
+      {Product:"Jontec 300", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec 300", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec Tensol", Method:"Trigger Spray", Pressure:"1.5 bar", PEG:"F", Dilution:8},
+      {Product:"Jontec Tensol", Method:"Trigger Spray", Pressure:"2.5 bar", PEG:"F", Dilution:8},
+      {Product:"Jontec Tensol", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec Tensol", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec Best", Method:"Bucket", Pressure:"1.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec Best", Method:"Bucket", Pressure:"2.5 bar", PEG:"L", Dilution:1},
+      {Product:"Jontec Forward", Method:"Bucket", Pressure:"1.5 bar", PEG:"J", Dilution:2},
+      {Product:"Jontec Forward", Method:"Bucket", Pressure:"2.5 bar", PEG:"J", Dilution:2}
+    ];
 
-    searchInput.addEventListener('input', filterTable);
-    categoryFilter.addEventListener('change', filterTable);
+    const productSelect = document.getElementById("product");
+    const methodSelect = document.getElementById("method");
+    const pressureSelect = document.getElementById("pressure");
+    const resultDiv = document.getElementById("result");
 
-    function filterTable() {
-      const query = searchInput.value.toLowerCase();
-      const selectedCategory = categoryFilter.value;
-
-      tableRows.forEach(row => {
-        if (row.classList.contains('category-row')) return;
-
-        const product = row.cells[0].textContent.toLowerCase();
-        const category = row.dataset.category;
-
-        const matchesSearch = product.includes(query);
-        const matchesCategory = (selectedCategory === "All" || category === selectedCategory);
-
-        row.classList.toggle('hidden', !(matchesSearch && matchesCategory));
+    function populateSelect(select, values) {
+      select.innerHTML = "";
+      values.forEach(val => {
+        const option = document.createElement("option");
+        option.value = val;
+        option.textContent = val;
+        select.appendChild(option);
       });
     }
 
-    function sortTable(n) {
-      const table = document.getElementById("pegTable");
-      let switching = true;
-      let dir = "asc";
-      let switchcount = 0;
+    function updateResult() {
+      const product = productSelect.value;
+      const method = methodSelect.value;
+      const pressure = pressureSelect.value;
 
-      while (switching) {
-        switching = false;
-        const rows = table.rows;
-        for (let i = 2; i < rows.length - 1; i++) {
-          if (rows[i].classList.contains('category-row') || rows[i + 1].classList.contains('category-row')) continue;
-          let shouldSwitch = false;
-          const x = rows[i].getElementsByTagName("TD")[n];
-          const y = rows[i + 1].getElementsByTagName("TD")[n];
+      const match = data.find(d =>
+        d.Product === product &&
+        d.Method === method &&
+        d.Pressure === pressure
+      );
 
-          let xContent = x.textContent.replace('%','');
-          let yContent = y.textContent.replace('%','');
-          const xVal = isNaN(parseFloat(xContent)) ? xContent.toLowerCase() : parseFloat(xContent);
-          const yVal = isNaN(parseFloat(yContent)) ? yContent.toLowerCase() : parseFloat(yContent);
-
-          if ((dir == "asc" && xVal > yVal) || (dir == "desc" && xVal < yVal)) {
-            shouldSwitch = true;
-            break;
-          }
-        }
-        if (shouldSwitch) {
-          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-          switching = true;
-          switchcount++;
-        } else {
-          if (switchcount == 0 && dir == "asc") {
-            dir = "desc";
-            switching = true;
-          }
-        }
+      if (match) {
+        resultDiv.textContent = `PEG Setting: ${match.PEG}, Dilution: ${match.Dilution}%`;
+      } else {
+        resultDiv.textContent = "No data found for selection.";
       }
     }
-  </script>
 
+    function init() {
+      const unique = (arr, key) => [...new Set(arr.map(item => item[key]))];
+
+      populateSelect(productSelect, unique(data, "Product"));
+      populateSelect(methodSelect, unique(data, "Method"));
+      populateSelect(pressureSelect, unique(data, "Pressure"));
+
+      productSelect.addEventListener("change", updateResult);
+      methodSelect.addEventListener("change", updateResult);
+      pressureSelect.addEventListener("change", updateResult);
+    }
+
+    window.onload = init;
+  </script>
 </body>
 </html>
