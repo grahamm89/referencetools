@@ -11,6 +11,7 @@
     --c-card:#fff;
     --c-text:#222;
     --c-accent:#0073e6;
+    --c-sep:rgba(0,0,0,.08);
   }
   @media (prefers-color-scheme:dark){
     :root{
@@ -18,6 +19,7 @@
       --c-card:#1e2125;
       --c-text:#e0e3e6;
       --c-accent:#53a2ff;
+      --c-sep:rgba(255,255,255,.08);
     }
   }
   *{box-sizing:border-box}
@@ -53,30 +55,36 @@
     transition:opacity .18s;
   }
   button:hover{opacity:.9}
-  .result{
-    margin-top:1rem;
-    border-left:4px solid var(--c-accent);
-    padding-left:1rem;
-  }
-  /* -------- checklist table (desktop & tablet) -------- */
-  table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:.5rem;
-  }
+
+  /* result panels – hidden until .show is added */
+  .result{display:none;margin-top:1rem;border-left:4px solid var(--c-accent);padding-left:1rem}
+  .result.show{display:block}
+
+  /* -------- checklist (desktop) -------- */
+  table{width:100%;border-collapse:collapse;margin-top:.5rem}
   th,td{padding:.45rem .6rem;text-align:left}
   th{background:#eaf2fd}
   tr:nth-child(even){background:#f0f4f8}
-  /* -------- mobile optimisation -------- */
+
+  /* -------- section-3 prettier list -------- */
+  #fieldTests ul{list-style:none;padding:0;margin:0}
+  #fieldTests li{
+    padding:.7rem 0;
+    font-size:1.05rem;
+    border-bottom:1px solid var(--c-sep);
+  }
+  #fieldTests li:last-child{border:none}
+  #fieldTests strong{display:block;margin-bottom:.25rem}
+
+  /* -------- mobile tweaks -------- */
   @media (max-width:640px){
     body{padding:.6rem}
     h1{font-size:1.35rem}
     h2{font-size:1.15rem;margin:.2rem 0 .7rem}
-    select,button{font-size:1rem}
-    /* turn table rows into stacked blocks */
+    /* stacked checklist */
     table,thead,tbody,tr,th,td{display:block;width:100%}
     thead{display:none}
-    tr{margin-bottom:1rem;border-bottom:1px solid rgba(0,0,0,.06);padding-bottom:.6rem}
+    tr{margin-bottom:1rem;border-bottom:1px solid var(--c-sep);padding-bottom:.6rem}
     tr:nth-child(even){background:transparent}
     td{padding:.25rem 0}
     td:first-child{font-weight:600}
@@ -121,20 +129,13 @@
   <form id="checklistForm">
     <table>
       <tr><th>Question</th><th>Answer</th></tr>
-      <tr><td>Is the dosing equipment <strong>switched on</strong>?</td>
-          <td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td>
-          <td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Are the temperatures within spec (40-55 °C pre-wash, 55-65 °C wash, 80-90 °C final rinse)?</td>
-          <td><select name="temps"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Are all wash &amp; rinse jets clear?</td>
-          <td><select name="jets"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Are staff following good practice (pre-scraping, correct racking)?</td>
-          <td><select name="practice"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Is the correct detergent in the correct container?</td>
-          <td><select name="detergent"><option>Yes</option><option>No</option></select></td></tr>
-      <tr><td>Has detergent strength been checked (titration)?</td>
-          <td><select name="titration"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Is the dosing equipment <strong>switched on</strong>?</td><td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td><td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Are the temperatures within spec (40-55 °C pre-wash, 55-65 °C wash, 80-90 °C final rinse)?</td><td><select name="temps"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Are all wash &amp; rinse jets clear?</td><td><select name="jets"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Are staff following good practice (pre-scraping, correct racking)?</td><td><select name="practice"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Is the correct detergent in the correct container?</td><td><select name="detergent"><option>Yes</option><option>No</option></select></td></tr>
+      <tr><td>Has detergent strength been checked (titration)?</td><td><select name="titration"><option>Yes</option><option>No</option></select></td></tr>
     </table>
     <button type="button" id="evaluateBtn">Evaluate Checklist</button>
   </form>
@@ -143,15 +144,24 @@
 </section>
 
 <!-- ====================================================== -->
-<section>
+<section id="fieldTests">
   <h2>3. Field Chemical Tests</h2>
   <ul>
-    <li><strong>Detergent carry-over</strong> – Indicator reagent → pink = alkali film → check rinse jets/pressure.</li>
-    <li><strong>Starch detection</strong> – ACID 1 + Iodide/Iodate → blue/black = starch → boost detergent, temp &amp; practice.</li>
-    <li><strong>Limescale detection</strong> – ACID 3 → fizz = scale → descale machine &amp; verify softener.</li>
+    <li>
+      <strong>Detergent carry-over</strong>
+      Add indicator reagent to a washed item; <em>pink = alkali film</em> → check rinse jets/pressure.
+    </li>
+    <li>
+      <strong>Starch detection</strong>
+      Add a drop of ACID 1 then Iodide/Iodate; <em>blue/black = starch</em> → boost detergent, temperature &amp; practices.
+    </li>
+    <li>
+      <strong>Limescale detection</strong>
+      Add a few drops of ACID 3; <em>fizz = scale present</em> → descale machine &amp; verify softener.
+    </li>
   </ul>
-  <p>
-    Need to titrate detergent? 
+  <p style="margin-top:1rem">
+    Need to titrate detergent?&nbsp;
     <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
       Launch the concentration web app
     </a>
@@ -162,67 +172,68 @@
 <script>
 /* ---------- symptom database ---------- */
 var SYMPTOM_DATA = {
-  "Tannin Stains": {
+  "Tannin Stains":{
     causes:"Tea / coffee / wine tannins (worse on eroded glaze).",
     actions:"Use chlorinated detergents or pre-soak with <em>Suma&nbsp;Shine&nbsp;K2</em>. In glass-washers run a cycle with <em>Bactosol</em> renovator."
   },
-  "Starch": {
+  "Starch":{
     causes:"Heated plates, long delays, sticky foods, low detergent, poor wash pressure or temperatures.",
     actions:"Increase detergent strength or use a more alkaline product; raise wash temperature; boost wash pressure; improve pre-scraping and loading practice."
   },
-  "Foaming": {
+  "Foaming":{
     causes:"Low wash/rinse temperature, hand-wash detergent contamination, high food soil, high tank level, weak rinse.",
     actions:"Raise temperatures; reduce rinse-aid dose; eliminate incompatible hand detergent; correct water level; improve rinse performance."
   },
-  "Drying Marks": {
+  "Drying Marks":{
     causes:"Poor or no rinse, incorrect rinse-aid dose, wrong rinse temperature, hard water / high dissolved solids, poor racking.",
     actions:"Repair rinse section; adjust rinse-aid; optimise rinse temperature (80–90 °C); use hard-water rinse-aid or a de-ioniser; correct racking technique."
   },
-  "Detergent Overuse": {
+  "Detergent Overuse":{
     causes:"Leaking equipment, high set-point, scaled probe, broken fill valve, jammed powder solenoid.",
     actions:"Repair leaks; descale &amp; clean probe; lower set-point to match water hardness; free jammed solenoid."
   },
-  "Limescale": {
+  "Limescale":{
     causes:"No/failed softener, low detergent, wrong rinse-aid for hard water.",
     actions:"Regenerate or repair softener; raise detergent dose; switch to hard-water detergent &amp; rinse-aid; descale machine."
   },
-  "Cracking Plastic": {
+  "Cracking Plastic":{
     causes:"Excessive heat, non-ionic hand detergent, aggressive rinse-aids, high chlorine.",
     actions:"Lower rinse temperature; remove offending chemicals; use plastic-safe products (A11, A8); minimise chlorine exposure."
   },
-  "Bits After Rinsing": {
+  "Bits After Rinsing":{
     causes:"Broken rinse, dirty wash water, debris in rinse, poor pre-scrape, poor racking.",
     actions:"Repair rinse; change &amp; filter wash water; improve pre-scraping; flush rinse line; correct racking."
   },
-  "Detergent Carryover": {
+  "Detergent Carryover":{
     causes:"Poor rinse, very high detergent, low rinse pressure / blocked jets.",
     actions:"Repair rinse; reduce detergent dose; increase rinse pressure; clear rinse jets."
   },
-  "Cloudy Glasses": {
+  "Cloudy Glasses":{
     causes:"Hard-water scale, detergent carry-over, excessive detergent, high dissolved solids.",
     actions:"Install/repair softener; optimise detergent (not too low or high); improve rinse pressure &amp; temperature."
   },
-  "Rusty Cutlery": {
+  "Rusty Cutlery":{
     causes:"Prolonged soaking, contact with salt or chlorinated product at high concentration.",
     actions:"Shorten soak times; rinse promptly; eliminate or dilute chlorine sources; upgrade cutlery grade if persistent."
   },
-  "Black SS Cutlery": {
+  "Black SS Cutlery":{
     causes:"Contact with silver dip or excessive heat.",
     actions:"Keep stainless steel away from <em>Suma&nbsp;Silver&nbsp;D8</em>; avoid overheating."
   },
-  "Silver Tarnishing": {
+  "Silver Tarnishing":{
     causes:"Sulphides (e.g., eggs), fires, chlorine, excessive heat.",
     actions:"Minimise sulphide &amp; chlorine exposure; avoid overheating; burnish silver to restore shine."
   },
-  "Machine Scaled": {
+  "Machine Scaled":{
     causes:"Hard-water scale forming on surfaces &amp; heaters (detergent deficiency, empty softener).",
     actions:"Add salt to softener; ensure detergent is available; descale with limescale remover."
   },
-  "Wash Jets Blocked": {
+  "Wash Jets Blocked":{
     causes:"Debris clogging wash arm jets.",
     actions:"Remove arms, poke out debris &amp; flush before each wash."
   }
 };
+
 /* ---------- checklist advice rules ---------- */
 function checklistAdvice(f){
   var m=[];
@@ -235,28 +246,31 @@ function checklistAdvice(f){
   if(f.titration==="No")      m.push("Perform a detergent titration test and adjust strength as needed.");
   return m;
 }
+
 /* ---------- DOM ready ---------- */
 document.addEventListener("DOMContentLoaded",function(){
 
   /* Symptom lookup */
   document.getElementById("symptom").addEventListener("change",function(){
-    var key = (this.value || "").trim();   // removes stray spaces
-    var box = document.getElementById("symptomResult");
-    if(!key){box.innerHTML="";return;}
+    var key=(this.value||"").trim();            /* remove stray spaces */
+    var box=document.getElementById("symptomResult");
+    if(!key){box.classList.remove("show");return;}
     var d=SYMPTOM_DATA[key];
-    if(!d){box.innerHTML="<em>No data for '"+key+"'</em>";return;}
+    if(!d){box.classList.remove("show");return;}
     box.innerHTML="<h3>Possible causes</h3><p>"+d.causes+
                   "</p><h3>Recommended actions</h3><p>"+d.actions+"</p>";
+    box.classList.add("show");
   });
 
   /* Checklist evaluate */
   document.getElementById("evaluateBtn").addEventListener("click",function(){
-    var fd=new FormData(document.getElementById("checklistForm"));
-    var obj={}; fd.forEach(function(v,k){obj[k]=v;});
+    var fd=new FormData(document.getElementById("checklistForm")), obj={};
+    fd.forEach(function(v,k){obj[k]=v;});
     var a=checklistAdvice(obj);
-    document.getElementById("checklistResult").innerHTML=
-      a.length?("<h3>Checklist findings</h3><ul><li>"+a.join("</li><li>")+"</li></ul>")
-              :"<p>No obvious issues from the checklist.</p>";
+    var box=document.getElementById("checklistResult");
+    box.innerHTML=a.length?("<h3>Checklist findings</h3><ul><li>"+a.join("</li><li>")+"</li></ul>")
+                          :"<p>No obvious issues from the checklist.</p>";
+    box.classList.add("show");
   });
 
 });
