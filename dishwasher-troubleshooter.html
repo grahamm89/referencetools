@@ -3,46 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dishwasher Troubleshooting Helper — full source data</title>
+<title>Dishwasher Troubleshooting Helper — interactive checklist</title>
 <style>
- :root{--bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;--sep:rgba(0,0,0,.08)}
+ :root{
+  --bg:#f7f9fa; --card:#fff; --txt:#222;
+  --accent:#0073e6; --sep:rgba(0,0,0,.08); --yes:#2e8b57; --no:#c0392b;
+ }
  @media (prefers-color-scheme:dark){
-   :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;--sep:rgba(255,255,255,.08)}
+  :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;
+        --sep:rgba(255,255,255,.08);--yes:#2ecc71;--no:#e74c3c;}
  }
  *{box-sizing:border-box}
- body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
+ body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
  h1{margin:.2rem 0 1rem}
- section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
+ section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;
+         box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
  label{font-weight:600}
+
+ /* ===== symptom & field tests (unchanged style) ===== */
  select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
  select{width:100%}
- button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
- button:hover{opacity:.9}
  .result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
  .result.show{display:block}
-
- /* checklist table */
- table{width:100%;border-collapse:collapse;margin-top:.5rem}
- th,td{padding:.45rem .6rem;text-align:left}
- th{background:#eaf2fd}
- tr:nth-child(even){background:#f0f4f8}
-
- /* permanently hide the heading row */
- #checklistForm thead{display:none}
-
- /* field test list */
- #fieldTests ul{list-style:none;padding:0;margin:0}
+ #fieldTests ul{list-style:none;margin:0;padding:0}
  #fieldTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
  #fieldTests li:last-child{border:none}
  #fieldTests strong{display:block;margin-bottom:.3rem}
 
+ /* ===== new checklist cards ===== */
+ .qcard{border:1px solid var(--sep);border-radius:6px;padding:.7rem .9rem;
+        margin-bottom:.9rem;display:flex;flex-wrap:wrap;align-items:center}
+ .qcard p{flex:1 1 260px;margin:.2rem 0;font-weight:500}
+ .toggle{display:inline-flex;border-radius:20px;overflow:hidden;margin-left:auto}
+ .toggle input{display:none}
+ .toggle label{padding:.3rem .9rem;cursor:pointer;font-size:.92rem}
+ .toggle .yes{background:var(--yes);color:#fff}
+ .toggle .no {background:var(--no); color:#fff}
+ .toggle input:checked + label{filter:brightness(1.15)}
+ .qcard .note{flex:1 1 100%;margin:.25rem 0 0;font-size:.85rem;color:var(--accent)}
+
  /* mobile tweaks */
  @media (max-width:640px){
-   body{padding:.6rem}h1{font-size:1.35rem}h2{font-size:1.15rem;margin:.25rem 0 .7rem}
-   table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none} /* keeps header hidden on mobile too */
-   tr{margin-bottom:1rem;border-bottom:1px solid var(--sep);padding-bottom:.6rem}
-   tr:nth-child(even){background:transparent}td{padding:.25rem 0}td:first-child{font-weight:600}
-   button{width:100%;margin-top:.9rem}.result{padding-left:.7rem}
+   body{padding:.6rem}h1{font-size:1.35rem}
+   h2{font-size:1.15rem;margin:.25rem 0 .7rem}
  }
 </style>
 </head>
@@ -50,7 +54,7 @@
 
 <h1>Dishwasher Troubleshooting Helper</h1>
 
-<!-- ========== 1. Quick Symptom Lookup ========== -->
+<!-- ====================== 1. symptom lookup ====================== -->
 <section>
  <h2>1. Quick Symptom Lookup</h2>
  <label for="symptom">Observed symptom or issue:</label>
@@ -76,163 +80,172 @@
  <div id="symptomResult" class="result"></div>
 </section>
 
-<!-- ========== 2. Machine / Practice Checklist ========== -->
+<!-- ====================== 2. live checklist ====================== -->
 <section>
  <h2>2. Machine / Practice Checklist</h2>
- <form id="checklistForm">
-  <table>
-   <thead>
-    <tr><th>Question</th><th>Answer</th></tr>
-   </thead>
-   <tbody>
-    <tr><td>Is the dosing equipment <strong>switched on</strong>?</td><td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td><td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Are temperatures within spec (40-55 °C pre-wash; 55-65 °C wash; 80-90 °C final rinse)?</td><td><select name="temps"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Are all wash &amp; rinse jets clear?</td><td><select name="jets"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Are staff following good practice (pre-scrape, correct racking)?</td><td><select name="practice"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Is the correct detergent in the correct container?</td><td><select name="detergent"><option>Yes</option><option>No</option></select></td></tr>
-    <tr><td>Has detergent strength been checked (titration)?</td><td><select name="titration"><option>Yes</option><option>No</option></select></td></tr>
-   </tbody>
-  </table>
-  <button type="button" id="evaluateBtn">Evaluate Checklist</button>
- </form>
+
+ <!-- each .qcard = one question -->
+ <div class="qcard" data-key="dosingOn">
+   <p>Is the dosing equipment <strong>switched on</strong>?</p>
+   <div class="toggle">
+     <input type="radio" id="dosingOnYes" name="dosingOn" value="Yes" checked>
+     <label class="yes" for="dosingOnYes">Yes</label>
+     <input type="radio" id="dosingOnNo"  name="dosingOn" value="No">
+     <label class="no"  for="dosingOnNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="dosingWorking">
+   <p>Is the dosing equipment <strong>working correctly</strong>?</p>
+   <div class="toggle">
+     <input type="radio" id="dosingWorkingYes" name="dosingWorking" value="Yes" checked>
+     <label class="yes" for="dosingWorkingYes">Yes</label>
+     <input type="radio" id="dosingWorkingNo"  name="dosingWorking" value="No">
+     <label class="no"  for="dosingWorkingNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="temps">
+   <p>Are temperatures within spec (40-55 °C pre-wash; 55-65 °C wash; 80-90 °C final rinse)?</p>
+   <div class="toggle">
+     <input type="radio" id="tempsYes" name="temps" value="Yes" checked>
+     <label class="yes" for="tempsYes">Yes</label>
+     <input type="radio" id="tempsNo"  name="temps" value="No">
+     <label class="no"  for="tempsNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="jets">
+   <p>Are all wash &amp; rinse jets clear?</p>
+   <div class="toggle">
+     <input type="radio" id="jetsYes" name="jets" value="Yes" checked>
+     <label class="yes" for="jetsYes">Yes</label>
+     <input type="radio" id="jetsNo"  name="jets" value="No">
+     <label class="no"  for="jetsNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="practice">
+   <p>Are staff following good practice (pre-scrape, correct racking)?</p>
+   <div class="toggle">
+     <input type="radio" id="practiceYes" name="practice" value="Yes" checked>
+     <label class="yes" for="practiceYes">Yes</label>
+     <input type="radio" id="practiceNo"  name="practice" value="No">
+     <label class="no"  for="practiceNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="detergent">
+   <p>Is the correct detergent in the correct container?</p>
+   <div class="toggle">
+     <input type="radio" id="detergentYes" name="detergent" value="Yes" checked>
+     <label class="yes" for="detergentYes">Yes</label>
+     <input type="radio" id="detergentNo"  name="detergent" value="No">
+     <label class="no"  for="detergentNo">No</label>
+   </div>
+ </div>
+
+ <div class="qcard" data-key="titration">
+   <p>Has detergent strength been checked (titration)?</p>
+   <div class="toggle">
+     <input type="radio" id="titrationYes" name="titration" value="Yes" checked>
+     <label class="yes" for="titrationYes">Yes</label>
+     <input type="radio" id="titrationNo"  name="titration" value="No">
+     <label class="no"  for="titrationNo">No</label>
+   </div>
+ </div>
 
  <div id="checklistResult" class="result"></div>
 </section>
 
-<!-- ========== 3. Field Chemical Tests ========== -->
+<!-- ====================== 3. field tests ====================== -->
 <section id="fieldTests">
- <h2>3. Field Chemical Tests</h2>
- <ul>
-  <li><strong>Detergent Carry Over</strong><br>
-      When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.</li>
-  <li><strong>Detection of Starch</strong><br>
-      A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.</li>
-  <li><strong>Detection of Limescale</strong><br>
-      Use a few drops of ACID 3 on the item — bubbles form and scale is removed.</li>
- </ul>
- <p style="margin-top:1rem">
-  Need to titrate detergent?&nbsp;
-  <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">Open the concentration web-app</a>
- </p>
+  <h2>3. Field Chemical Tests</h2>
+  <ul>
+    <li><strong>Detergent Carry Over</strong><br>
+        When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.</li>
+    <li><strong>Detection of Starch</strong><br>
+        A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.</li>
+    <li><strong>Detection of Limescale</strong><br>
+        Use a few drops of ACID 3 on the item — bubbles form and scale removed.</li>
+  </ul>
+  <p style="margin-top:1rem">
+    Need to titrate detergent? 
+    <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
+      Open the concentration web-app
+    </a>
+  </p>
 </section>
 
-<!-- ========== JavaScript ========== -->
+<!-- ====================== JavaScript (ES-5) ====================== -->
 <script>
-/* --- verbatim symptom data --- */
-const DATA={
- "Tannin Stains":{
-  causes:"Tea or coffee and wine. Worse where glaze has eroded.",
-  consequences:"",
-  actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glasswashers."
- },
- "Starch":{
-  causes:"Heated plates, long delays, greasy sticky foods, low detergent level, poor wash pressure, poor wash temperatures.",
-  consequences:"",
-  actions:"Increase detergent level, change to a more alkaline detergent, improve practices, improve temperatures, increase wash pressure."
- },
- "Foaming":{
-  causes:"Low wash/rinse temperature, hand dishwashing detergents contaminating wash, high food soiling, high wash tank water level, poor rinse.",
-  consequences:"",
-  actions:"Increase temperature, reduce rinse aid level, remove problem detergents, improve draining, and remove high foam product."
- },
- "Drying Marks":{
-  causes:"No or poor performance from rinse, low rinse aid level, low rinse temperature, high rinse temperature, hard water, high dissolved solids, poor racking.",
-  consequences:"",
-  actions:"Repair dishwasher, increase rinse aid level, lower, or raise rinse temperature, use hard water rinse aid, in extreme cases use a de-ioniser, improve racking procedure."
- },
- "Detergent Overuse":{
-  causes:"Broken equipment (Diversey or machine) leaking drain, too high set point, scaled up probe, broken fill valve, jammed solenoid (for powders).",
-  consequences:"",
-  actions:"Repair or replace broken equipment, descale, and clean probe, reduce set point, ensure detergent level is correct for water hardness, ensure that solenoid is not jammed open."
- },
- "Limescale":{
-  causes:"No/broken water softener, incorrect detergent level, incorrect rinse aid.",
-  consequences:"",
-  actions:"Repair water softener, increase detergent level, move to hard water detergent, and rinse aid."
- },
- "Cracking Plastic":{
-  causes:"Excessive heat, non-ionic based hand dishwashing detergent, some rinse aids, very high levels of available chlorine.",
-  consequences:"",
-  actions:"Reduce temperatures on rinse section, remove any problem chemicals, use plastic safe products A11, A8, remove sources of chlorine as far as possible."
- },
- "Bits After Rinsing":{
-  causes:"Poor or broken machine rinse, dirty wash water, contaminated rinse water, coffee grounds and tea bags, poor racking.",
-  consequences:"",
-  actions:"Repair dishwasher, change wash water and clean out dishwasher, improve pre-scrapping operation, improve rinse water supply, improve racking."
- },
- "Detergent Carryover":{
-  causes:"Poor or broken machine rinse, very high detergent level, poor rinse pressure.",
-  consequences:"",
-  actions:"Repair dishwasher, reduce detergent level, increase rinse pressure, clear rinse jets."
- },
- "Cloudy Glasses":{
-  causes:"Hard water scale, detergent carryover, detergent level too high, high-water solids.",
-  consequences:"",
-  actions:"Increase detergent level, improve rinse pressure and temperature, reduce detergent level, suggest water softener is installed where needed."
- },
- "Rusty Cutlery":{
-  causes:"Prolonged soaking in any solution, contact with salt or chlorinated product at high concentration.",
-  consequences:"",
-  actions:"Improve operation, remove, or reduce sources of chlorine, upgrade cutlery."
- },
- "Black SS Cutlery":{
-  causes:"Silver dip, heat.",
-  consequences:"",
-  actions:"Do not bring stainless steel into contact with Suma Silver D8 or heat."
- },
- "Silver Tarnishing":{
-  causes:"Sulphides from eggs and other foods or from fires of any sort, chlorine from any source, excessive heat.",
-  consequences:"",
-  actions:"Remove the source of sulphides and chlorine and heat as far as possible, burnish to restore original appearance."
- },
- "Machine Scaled":{
-  causes:"In hard water areas, if insufficient detergent is present hard water scale (limestone) can form.",
-  consequences:"Porous scale in the machine can harbour bacteria, hygiene at risk / Wash results, especially cups, will be poor, customer dissatisfaction is likely. Cups will have to be soaked in Tannin Remover, taking time and cost. Heater elements will scale and become more inefficient; energy cost will rise.",
-  actions:"Put salt in the softener. Make sure detergent is available. Descale machine with a Limescale Remover."
- },
- "Wash Jets Blocked":{
-  causes:"The machine cleans by continuously passing wash water through the jets and onto the dirty plates. If the jets are blocked, then no water can pass. The jets are susceptible to debris getting caught.",
-  consequences:"Poor cleaning, customers may get dirty plates. Plates will have to be rewashed, taking time and cost.",
-  actions:"Before every wash clean out all the wash jets. Poke out stuck debris and flush with water. Remove the arms to do a thorough job."
- }
+/* ------- VERBATIM symptom data ------- */
+var DATA={
+ "Tannin Stains":{causes:"Tea or coffee and wine. Worse where glaze has eroded.",consequences:"",actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glasswashers."},
+ "Starch":{causes:"Heated plates, long delays, greasy sticky foods, low detergent level, poor wash pressure, poor wash temperatures.",consequences:"",actions:"Increase detergent level, change to a more alkaline detergent, improve practices, improve temperatures, increase wash pressure."},
+ "Foaming":{causes:"Low wash/rinse temperature, hand dishwashing detergents contaminating wash, high food soiling, high wash tank water level, poor rinse.",consequences:"",actions:"Increase temperature, reduce rinse aid level, remove problem detergents, improve draining, and remove high foam product."},
+ "Drying Marks":{causes:"No or poor performance from rinse, low rinse aid level, low rinse temperature, high rinse temperature, hard water, high dissolved solids, poor racking.",consequences:"",actions:"Repair dishwasher, increase rinse aid level, lower, or raise rinse temperature, use hard water rinse aid, in extreme cases use a de-ioniser, improve racking procedure."},
+ "Detergent Overuse":{causes:"Broken equipment (Diversey or machine) leaking drain, too high set point, scaled up probe, broken fill valve, jammed solenoid (for powders).",consequences:"",actions:"Repair or replace broken equipment, descale, and clean probe, reduce set point, ensure detergent level is correct for water hardness, ensure that solenoid is not jammed open."},
+ "Limescale":{causes:"No/broken water softener, incorrect detergent level, incorrect rinse aid.",consequences:"",actions:"Repair water softener, increase detergent level, move to hard water detergent, and rinse aid."},
+ "Cracking Plastic":{causes:"Excessive heat, non-ionic based hand dishwashing detergent, some rinse aids, very high levels of available chlorine.",consequences:"",actions:"Reduce temperatures on rinse section, remove any problem chemicals, use plastic safe products A11, A8, remove sources of chlorine as far as possible."},
+ "Bits After Rinsing":{causes:"Poor or broken machine rinse, dirty wash water, contaminated rinse water, coffee grounds and tea bags, poor racking.",consequences:"",actions:"Repair dishwasher, change wash water and clean out dishwasher, improve pre-scrapping operation, improve rinse water supply, improve racking."},
+ "Detergent Carryover":{causes:"Poor or broken machine rinse, very high detergent level, poor rinse pressure.",consequences:"",actions:"Repair dishwasher, reduce detergent level, increase rinse pressure, clear rinse jets."},
+ "Cloudy Glasses":{causes:"Hard water scale, detergent carryover, detergent level too high, high-water solids.",consequences:"",actions:"Increase detergent level, improve rinse pressure and temperature, reduce detergent level, suggest water softener is installed where needed."},
+ "Rusty Cutlery":{causes:"Prolonged soaking in any solution, contact with salt or chlorinated product at high concentration.",consequences:"",actions:"Improve operation, remove, or reduce sources of chlorine, upgrade cutlery."},
+ "Black SS Cutlery":{causes:"Silver dip, heat.",consequences:"",actions:"Do not bring stainless steel into contact with Suma Silver D8 or heat."},
+ "Silver Tarnishing":{causes:"Sulphides from eggs and other foods or from fires of any sort, chlorine from any source, excessive heat.",consequences:"",actions:"Remove the source of sulphides and chlorine and heat as far as possible, burnish to restore original appearance."},
+ "Machine Scaled":{causes:"In hard water areas, if insufficient detergent is present hard water scale (limestone) can form.",consequences:"Porous scale in the machine can harbour bacteria, hygiene at risk / Wash results, especially cups, will be poor, customer dissatisfaction is likely. Cups will have to be soaked in Tannin Remover, taking time and cost. Heater elements will scale and become more inefficient; energy cost will rise.",actions:"Put salt in the softener. Make sure detergent is available. Descale machine with a Limescale Remover."},
+ "Wash Jets Blocked":{causes:"The machine cleans by continuously passing wash water through the jets and onto the dirty plates. If the jets are blocked, then no water can pass. The jets are susceptible to debris getting caught.",consequences:"Poor cleaning, customers may get dirty plates. Plates will have to be rewashed, taking time and cost.",actions:"Before every wash clean out all the wash jets. Poke out stuck debris and flush with water. Remove the arms to do a thorough job."}
 };
 
-/* checklist helper */
-function advise(o){
- const a=[];
- if(o.dosingOn==="No")       a.push("Switch on the dosing unit.");
- if(o.dosingWorking==="No")  a.push("Repair or calibrate dosing equipment.");
- if(o.temps==="No")          a.push("Re-check temperatures.");
- if(o.jets==="No")           a.push("Clear wash & rinse jets.");
- if(o.practice==="No")       a.push("Improve pre-scraping and racking.");
- if(o.detergent==="No")      a.push("Connect correct detergent.");
- if(o.titration==="No")      a.push("Perform detergent titration.");
- return a;
+/* build advice from live switches */
+function buildAdvice(){
+ var list=[], qs=document.querySelectorAll('.qcard');
+ for(var i=0;i<qs.length;i++){
+   var key=qs[i].getAttribute('data-key');
+   var val=document.querySelector('input[name="'+key+'"]:checked').value;
+   if(val==="No"){
+     switch(key){
+       case "dosingOn":       list.push("Switch on the dosing unit.");break;
+       case "dosingWorking":  list.push("Repair or calibrate dosing equipment.");break;
+       case "temps":          list.push("Re-check temperatures.");break;
+       case "jets":           list.push("Clear wash & rinse jets.");break;
+       case "practice":       list.push("Improve pre-scraping and racking.");break;
+       case "detergent":      list.push("Connect correct detergent.");break;
+       case "titration":      list.push("Perform detergent titration.");break;
+     }
+   }
+ }
+ return list;
 }
 
-/* DOM ready */
-document.addEventListener("DOMContentLoaded",()=>{
- /* symptom lookup */
- document.getElementById("symptom").addEventListener("change",e=>{
-   const key=(e.target.value||"").trim(), box=document.getElementById("symptomResult");
-   if(!key){box.classList.remove("show");box.innerHTML="";return;}
-   const d=DATA[key]; if(!d){box.classList.remove("show");return;}
-   box.innerHTML=
-     `<p><strong>Causes:</strong> ${d.causes}</p>`+
-     (d.consequences?`<p><strong>Consequences:</strong> ${d.consequences}</p>`:"")+
-     `<p><strong>Possible solutions:</strong> ${d.actions}</p>`;
-   box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
- });
+/* symptom lookup */
+document.getElementById('symptom').onchange=function(){
+ var key=(this.value||"").trim(), box=document.getElementById('symptomResult');
+ if(!key){box.classList.remove('show');box.innerHTML="";return;}
+ var d=DATA[key];
+ if(!d){box.classList.remove('show');box.innerHTML="<em>No data found</em>";return;}
+ box.innerHTML="<p><strong>Causes:</strong> "+d.causes+"</p>"+
+               (d.consequences? "<p><strong>Consequences:</strong> "+d.consequences+"</p>":"")+
+               "<p><strong>Possible solutions:</strong> "+d.actions+"</p>";
+ box.classList.add('show');
+ box.scrollIntoView({behavior:'smooth',block:'start'});
+};
 
- /* checklist */
- document.getElementById("evaluateBtn").addEventListener("click",()=>{
-   const fd=new FormData(document.getElementById("checklistForm")), o={}; fd.forEach((v,k)=>o[k]=v);
-   const list=advise(o), box=document.getElementById("checklistResult");
-   box.innerHTML=list.length?`<h3>Checklist findings</h3><ul><li>${list.join("</li><li>")}</li></ul>`:"<p>No obvious issues from the checklist.</p>`;
-   box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
- });
-});
+/* live checklist update */
+function updateChecklist(){
+ var panel=document.getElementById('checklistResult');
+ var advice=buildAdvice();
+ panel.innerHTML=advice.length
+   ? "<h3>Checklist findings</h3><ul><li>"+advice.join("</li><li>")+"</li></ul>"
+   : "<p>No obvious issues from the checklist.</p>";
+ panel.classList.add('show');
+}
+
+/* attach listeners to every toggle */
+var radios=document.querySelectorAll('.toggle input');
+for(var i=0;i<radios.length;i++){radios[i].onchange=updateChecklist;}
+updateChecklist(); /* initial render */
 </script>
 </body>
 </html>
