@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Hardness Test</title>
+
+  <!-- ----------  STYLE  ---------- -->
+  <style>
+    :root {
+      font-size: 18px;             /* scales nicely on phones */
+      --accent:  #007aff;          /* iOS blue */
+      --soft:    #3ddc84;          /* green */
+      --medium:  #ffb938;          /* yellow-orange */
+      --hard:    #ff3b30;          /* red */
+    }
+    body {
+      margin: 0;
+      padding: 1.25rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f2f2f7;
+      color: #1c1c1e;
+      line-height: 1.4;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    /* collapsible instructions */
+    details {
+      background: #fff;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    summary {
+      font-size: 1.1rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* input card */
+    #formCard {
+      background: #fff;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input[type="number"] {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #c7c7cc;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+    }
+    /* hide spin-buttons in Chrome */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+    button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    button:active { opacity: .9; }
+
+    #result {
+      margin-top: 1.25rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Water Hardness Calculator</h1>
+
+  <!-- ----------  INSTRUCTIONS  ---------- -->
+  <details open>
+    <summary>Test Instructions</summary>
+    <ol>
+      <li>Fill the test vessel to the 10&nbsp;ml mark with water taken from the rinse arms, rinse water tank, or fill valve.</li>
+      <li>Add <strong>Hardness Reagent</strong> one drop at a time, holding the dropper bottle vertically. Swirl after each addition.</li>
+      <li>Continue until the colour changes from <span style="color:#ff3b30;">red</span> to <span style="color:#007aff;">blue</span>.</li>
+    </ol>
+  </details>
+
+  <!-- ----------  INPUT & RESULT  ---------- -->
+  <section id="formCard">
+    <label for="drops">Number of reagent drops used:</label>
+    <input
+      type="number"
+      id="drops"
+      min="0"
+      inputmode="numeric"
+      placeholder="e.g. 5" />
+
+    <button onclick="calculate()">Calculate Hardness</button>
+    <div id="result"></div>
+  </section>
+
+  <!-- ----------  SCRIPT  ---------- -->
+  <script>
+    function calculate() {
+      const drops = parseFloat(document.getElementById('drops').value);
+      const resultEl = document.getElementById('result');
+
+      // simple validation
+      if (isNaN(drops) || drops < 0) {
+        resultEl.textContent = 'Please enter a valid number of drops.';
+        resultEl.style.color = 'var(--accent)';
+        return;
+      }
+
+      // 1 drop == 20 ppm … same as your Shortcut
+      const ppm = drops * 20;
+      let classification = '';
+      let color = '';
+
+      if (ppm <= 100) {
+        classification = 'Soft Water';
+        color = 'var(--soft)';
+      } else if (ppm <= 200) {
+        classification = 'Medium Water';
+        color = 'var(--medium)';
+      } else {
+        classification = 'Hard Water';
+        color = 'var(--hard)';
+      }
+
+      resultEl.innerHTML = `${classification}: <span>${ppm}</span> ppm`;
+      resultEl.style.color = color;
+    }
+  </script>
+</body>
+</html>
