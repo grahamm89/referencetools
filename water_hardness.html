@@ -1,117 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dishwasher Troubleshooting Helper</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Hardness Test</title>
 
-<style>
-:root{
-  --bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;--sep:rgba(0,0,0,.08);
-  --yes:#2e8b57;--no:#c0392b
-}
-@media (prefers-color-scheme:dark){
-  :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;
-        --sep:rgba(255,255,255,.08);--yes:#2ecc71;--no:#e74c3c}
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-     background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
-h1{margin:.2rem 0 .5rem}
-section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;
-        box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
-label{font-weight:600}
-a.inline{color:var(--accent);text-decoration:none;font-weight:600}
-a.inline:hover{text-decoration:underline}
-select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
-select{width:100%}
-button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
-button:hover{opacity:.9}
-.result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
-.result.show{display:block}
+  <!-- ----------  STYLE  ---------- -->
+  <style>
+    :root {
+      font-size: 18px;             /* scales nicely on phones */
+      --accent:  #007aff;          /* iOS blue */
+      --soft:    #3ddc84;          /* green */
+      --medium:  #ffb938;          /* yellow-orange */
+      --hard:    #ff3b30;          /* red */
+    }
+    body {
+      margin: 0;
+      padding: 1.25rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #f2f2f7;
+      color: #1c1c1e;
+      line-height: 1.4;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 1.5rem;
+      text-align: center;
+      color: var(--accent);
+    }
 
-/* Essential-check cards */
-.qcard{border:1px solid var(--sep);border-radius:6px;padding:.8rem .9rem;margin-bottom:.9rem;display:flex;flex-wrap:wrap;align-items:center}
-.qcard p{flex:1 1 260px;margin:.25rem 0;font-weight:500}
-.toggle{display:inline-flex;border-radius:20px;overflow:hidden;margin-left:auto}
-.toggle input{display:none}
-.toggle label{padding:.34rem .95rem;font-size:.92rem;cursor:pointer;transition:opacity .15s}
-.toggle .yes{background:var(--yes);color:#fff}
-.toggle .no {background:var(--no); color:#fff}
-.toggle label{opacity:.4}
-.toggle input:checked+label{opacity:1}
-.note{flex:1 1 100%;margin:.4rem 0 0;font-size:.85rem;color:var(--accent)}
+    /* collapsible instructions */
+    details {
+      background: #fff;
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    summary {
+      font-size: 1.1rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
 
-/* make / model */
-.mm-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
-.mm-row div{flex:1 1 200px}
-.mm-row input{width:100%;padding:.5rem;border:1px solid var(--sep);border-radius:6px}
+    /* input card */
+    #formCard {
+      background: #fff;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,.05);
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input[type="number"] {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #c7c7cc;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+    }
+    /* hide spin-buttons in Chrome */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* Chemical Tests list */
-#chemTests ul{list-style:none;margin:0;padding:0}
-#chemTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
-#chemTests li:last-child{border:none}
-#chemTests strong{display:block;margin-bottom:.3rem}
+    button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    button:active { opacity: .9; }
 
-/* Essential Tests bar */
-#essBar{margin-bottom:1.2rem;font-size:.95rem}
-#essBar a{margin-right:1.2rem}
-</style>
+    #result {
+      margin-top: 1.25rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
+  <h1>Water Hardness Calculator</h1>
 
-<h1>Dishwasher Troubleshooting Helper</h1>
+  <!-- ----------  INSTRUCTIONS  ---------- -->
+  <details open>
+    <summary>Test Instructions</summary>
+    <ol>
+      <li>Fill the test vessel to the 10&nbsp;ml mark with water taken from the rinse arms, rinse water tank, or fill valve.</li>
+      <li>Add <strong>Hardness Reagent</strong> one drop at a time, holding the dropper bottle vertically. Swirl after each addition.</li>
+      <li>Continue until the colour changes from <span style="color:#ff3b30;">red</span> to <span style="color:#007aff;">blue</span>.</li>
+    </ol>
+  </details>
 
-<!-- ======= Essential Tests bar ======= -->
-<div id="essBar">
-  <strong>Essential Tests:</strong>
-  <a class="inline" href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
-    Titration Test
-  </a>
-  <a class="inline" href="https://grahamm89.github.io/referencetools/water_hardness.html" target="_blank" rel="noopener">
-    Water Hardness
-  </a>
-</div>
+  <!-- ----------  INPUT & RESULT  ---------- -->
+  <section id="formCard">
+    <label for="drops">Number of reagent drops used:</label>
+    <input
+      type="number"
+      id="drops"
+      min="0"
+      inputmode="numeric"
+      placeholder="e.g. 5" />
 
-<!-- ========= 1. Quick Symptom Lookup ========= -->
-<section>
-  <h2>1. Quick Symptom Lookup</h2>
-  <label for="symptom">Observed symptom or issue:</label>
-  <select id="symptom"> … (options unchanged) … </select>
-  <div id="symptomResult" class="result"></div>
-</section>
+    <button onclick="calculate()">Calculate Hardness</button>
+    <div id="result"></div>
+  </section>
 
-<!-- ========= 2. Essential Checks ========= -->
-<section>
-  <h2>2. Essential Checks</h2>
-  <!-- make/model + seven toggle cards (unchanged from previous version) -->
-  … (same HTML for Section 2 as before) …
-</section>
+  <!-- ----------  SCRIPT  ---------- -->
+  <script>
+    function calculate() {
+      const drops = parseFloat(document.getElementById('drops').value);
+      const resultEl = document.getElementById('result');
 
-<!-- ========= 3. Chemical Tests ========= -->
-<section id="chemTests">
-  <h2>3. Chemical Tests</h2>
-  <ul>
-    <li>
-      <strong>Detecting Detergent Carry Over&nbsp;:</strong><br>
-      Add <em>Indicator Reagent</em> to dishes or glassware. Pink colour shows alkali → detergent not rinsed off.<br>
-      <em>Check rinse arms are clear and rinse cycle operates.</em>
-    </li>
-    <li>
-      <strong>Detecting Starch&nbsp;:</strong><br>
-      Drop <em>ACID 1</em> on the surface, then <em>Iodide/Iodate</em>. Blue-black colour means starch is present.
-    </li>
-    <li>
-      <strong>Detecting Limescale&nbsp;:</strong><br>
-      Add a few drops of <em>ACID 3</em> to the suspect area. Bubbling indicates carbonate scale and removes it.
-    </li>
-  </ul>
-</section>
+      // simple validation
+      if (isNaN(drops) || drops < 0) {
+        resultEl.textContent = 'Please enter a valid number of drops.';
+        resultEl.style.color = 'var(--accent)';
+        return;
+      }
 
-<!-- ========== JavaScript ========== -->
-<script>
-/* DATA, lookup handler, essential-checks logic, copy button */
-/* exactly the same JS as previous working file – omitted here for brevity */
-</script>
+      // 1 drop == 20 ppm … same as your Shortcut
+      const ppm = drops * 20;
+      let classification = '';
+      let color = '';
+
+      if (ppm <= 100) {
+        classification = 'Soft Water';
+        color = 'var(--soft)';
+      } else if (ppm <= 200) {
+        classification = 'Medium Water';
+        color = 'var(--medium)';
+      } else {
+        classification = 'Hard Water';
+        color = 'var(--hard)';
+      }
+
+      resultEl.innerHTML = `${classification}: <span>${ppm}</span> ppm`;
+      resultEl.style.color = color;
+    }
+  </script>
 </body>
 </html>
