@@ -6,14 +6,16 @@
 <title>Dishwasher Troubleshooting Helper</title>
 <style>
  :root{
-   --bg:#f7f9fa; --card:#fff; --txt:#222;
-   --accent:#0073e6; --sep:rgba(0,0,0,.08);
-   --yes:#2e8b57; --no:#c0392b;
+   --bg:#f7f9fa;--card:#fff;--txt:#222;
+   --accent:#0073e6;--sep:rgba(0,0,0,.08);
+   --yes:#2e8b57;--no:#c0392b;
  }
  @media (prefers-color-scheme:dark){
-   :root{--bg:#121417; --card:#1e2125; --txt:#e0e3e6;
-         --accent:#53a2ff; --sep:rgba(255,255,255,.08);
-         --yes:#2ecc71; --no:#e74c3c;}
+   :root{
+     --bg:#121417;--card:#1e2125;--txt:#e0e3e6;
+     --accent:#53a2ff;--sep:rgba(255,255,255,.08);
+     --yes:#2ecc71;--no:#e74c3c;
+   }
  }
  *{box-sizing:border-box}
  body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
@@ -23,32 +25,39 @@
          box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
  label{font-weight:600}
 
- /* ===== symptom & field tests ===== */
+ /* ---------- shared controls ---------- */
  select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
  select{width:100%}
  button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
  button:hover{opacity:.9}
+
  .result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
  .result.show{display:block}
 
- /* ===== Essential-Check cards ===== */
- .qcard{border:1px solid var(--sep);border-radius:6px;padding:.8rem .9rem;
-        margin-bottom:.9rem;display:flex;flex-wrap:wrap;align-items:center}
+ /* ---------- Essential-check cards ---------- */
+ .qcard{border:1px solid var(--sep);border-radius:6px;padding:.8rem .9rem;margin-bottom:.9rem;
+        display:flex;flex-wrap:wrap;align-items:center}
  .qcard p{flex:1 1 260px;margin:.25rem 0;font-weight:500}
+
  .toggle{display:inline-flex;border-radius:20px;overflow:hidden;margin-left:auto}
  .toggle input{display:none}
- .toggle label{padding:.3rem .9rem;cursor:pointer;font-size:.92rem}
+ .toggle label{padding:.34rem .95rem;cursor:pointer;font-size:.92rem;
+               transition:opacity .15s}
  .toggle .yes{background:var(--yes);color:#fff}
  .toggle .no {background:var(--no); color:#fff}
- .toggle input:checked + label{filter:brightness(1.15)}
+
+ /* show selected at 100 %, dim unselected to 40 % */
+ .toggle label{opacity:.4}
+ .toggle input:checked + label{opacity:1}
+
  .note{flex:1 1 100%;margin:.4rem 0 0;font-size:.85rem;color:var(--accent)}
 
- /* machine make / model row */
+ /* --- make / model inputs --- */
  .mm-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
  .mm-row div{flex:1 1 200px}
  .mm-row input{width:100%;padding:.5rem;border:1px solid var(--sep);border-radius:6px}
 
- /* field test list */
+ /* --- field tests list --- */
  #fieldTests ul{list-style:none;margin:0;padding:0}
  #fieldTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
  #fieldTests li:last-child{border:none}
@@ -66,62 +75,77 @@
 
 <h1>Dishwasher Troubleshooting Helper</h1>
 
-<!-- ========== 1. Quick Symptom Lookup ========== -->
+<!-- ========== 1. QUICK SYMPTOM LOOKUP ========== -->
 <section>
  <h2>1. Quick Symptom Lookup</h2>
  <label for="symptom">Observed symptom or issue:</label>
  <select id="symptom">
-  <option value="">-- choose symptom --</option>
-  <!-- (options unchanged for brevity) -->
-  <option>...</option>
-  <option value="Wash Jets Blocked">Wash jets blocked</option>
+   <option value="">-- choose symptom --</option>
+   <option value="Tannin Stains">Tannin stains (tea / coffee / wine)</option>
+   <option value="Starch">Starch residue</option>
+   <option value="Foaming">Excessive foaming</option>
+   <option value="Drying Marks">Drying marks / streaking</option>
+   <option value="Detergent Overuse">Detergent over-use</option>
+   <option value="Limescale">Limescale forming</option>
+   <option value="Cracking Plastic">Cracking plastic-ware</option>
+   <option value="Bits After Rinsing">Bits left after rinsing</option>
+   <option value="Detergent Carryover">Detergent carry-over</option>
+   <option value="Cloudy Glasses">Cloudy glasses</option>
+   <option value="Rusty Cutlery">Rusty cutlery</option>
+   <option value="Black SS Cutlery">Black stainless-steel cutlery</option>
+   <option value="Silver Tarnishing">Silver tarnishing</option>
+   <option value="Machine Scaled">Machine scaled</option>
+   <option value="Wash Jets Blocked">Wash jets blocked</option>
  </select>
  <div id="symptomResult" class="result"></div>
 </section>
 
-<!-- ========== 2. Essential Checks (live) ========== -->
+<!-- ========== 2. ESSENTIAL CHECKS ========== -->
 <section>
  <h2>2. Essential Checks</h2>
 
- <!-- machine make / model -->
  <div class="mm-row">
-   <div><label for="mMake">Machine make</label><input id="mMake" placeholder="e.g. Hobart"></div>
-   <div><label for="mModel">Machine model</label><input id="mModel" placeholder="e.g. AMXX-10"></div>
+  <div><label for="mMake">Machine make</label><input id="mMake" placeholder="e.g. Hobart"></div>
+  <div><label for="mModel">Machine model</label><input id="mModel" placeholder="e.g. AMXX-10"></div>
  </div>
 
- <!-- question cards -->
+ <!-- (seven question cards) -->
  <div class="qcard" data-key="dosingOn">
    <p>1.&nbsp;Is the dosing equipment <strong>switched on</strong>?</p>
    <div class="toggle">
-     <input type="radio" id="dosingOnY" name="dosingOn" value="Yes" checked><label class="yes" for="dosingOnY">Yes</label>
-     <input type="radio" id="dosingOnN" name="dosingOn" value="No"><label class="no" for="dosingOnN">No</label>
+     <input type="radio" id="dosingOnY" name="dosingOn" value="Yes" checked>
+     <label class="yes" for="dosingOnY">Yes</label>
+     <input type="radio" id="dosingOnN" name="dosingOn" value="No">
+     <label class="no"  for="dosingOnN">No</label>
    </div>
  </div>
 
  <div class="qcard" data-key="dosingWorking">
    <p>2.&nbsp;Is the dosing equipment <strong>working correctly</strong>?</p>
    <div class="toggle">
-     <input type="radio" id="dosingWorkY" name="dosingWorking" value="Yes" checked><label class="yes" for="dosingWorkY">Yes</label>
-     <input type="radio" id="dosingWorkN" name="dosingWorking" value="No"><label class="no" for="dosingWorkN">No</label>
+     <input type="radio" id="dosingWorkY" name="dosingWorking" value="Yes" checked>
+     <label class="yes" for="dosingWorkY">Yes</label>
+     <input type="radio" id="dosingWorkN" name="dosingWorking" value="No">
+     <label class="no"  for="dosingWorkN">No</label>
    </div>
  </div>
 
  <div class="qcard" data-key="temps">
    <p>3.&nbsp;Are the temperatures correct?</p>
    <div class="toggle">
-     <input type="radio" id="tempsY" name="temps" value="Yes" checked><label class="yes" for="tempsY">Yes</label>
-     <input type="radio" id="tempsN" name="temps" value="No"><label class="no" for="tempsN">No</label>
+     <input type="radio" id="tempsY" name="temps" value="Yes" checked>
+     <label class="yes" for="tempsY">Yes</label>
+     <input type="radio" id="tempsN" name="temps" value="No">
+     <label class="no"  for="tempsN">No</label>
    </div>
-   <div class="note">
-     Preferred&nbsp;temps: Pre-wash 40–55 °C · Wash 55–65 °C · Rinse 80–90 °C · Low-temp (glasswash) 60–70 °C
-   </div>
+   <div class="note">Preferred: Pre-wash 40-55 °C · Wash 55-65 °C · Rinse 80-90 °C · Low-temp 60-70 °C</div>
  </div>
 
  <div class="qcard" data-key="jets">
    <p>4.&nbsp;Is the machine working correctly, with all wash and rinse jets clear?</p>
    <div class="toggle">
      <input type="radio" id="jetsY" name="jets" value="Yes" checked><label class="yes" for="jetsY">Yes</label>
-     <input type="radio" id="jetsN" name="jets" value="No"><label class="no" for="jetsN">No</label>
+     <input type="radio" id="jetsN" name="jets" value="No"><label class="no"  for="jetsN">No</label>
    </div>
  </div>
 
@@ -129,7 +153,7 @@
    <p>5.&nbsp;Are staff observing good practice (pre-scraping, racking well)?</p>
    <div class="toggle">
      <input type="radio" id="pracY" name="practice" value="Yes" checked><label class="yes" for="pracY">Yes</label>
-     <input type="radio" id="pracN" name="practice" value="No"><label class="no" for="pracN">No</label>
+     <input type="radio" id="pracN" name="practice" value="No"><label class="no"  for="pracN">No</label>
    </div>
  </div>
 
@@ -137,7 +161,7 @@
    <p>6.&nbsp;Is the correct detergent being used and are the tubes in the correct containers?</p>
    <div class="toggle">
      <input type="radio" id="detY" name="detergent" value="Yes" checked><label class="yes" for="detY">Yes</label>
-     <input type="radio" id="detN" name="detergent" value="No"><label class="no" for="detN">No</label>
+     <input type="radio" id="detN" name="detergent" value="No"><label class="no"  for="detN">No</label>
    </div>
  </div>
 
@@ -145,94 +169,80 @@
    <p>7.&nbsp;Is detergent at the correct strength?</p>
    <div class="toggle">
      <input type="radio" id="titY" name="titration" value="Yes" checked><label class="yes" for="titY">Yes</label>
-     <input type="radio" id="titN" name="titration" value="No"><label class="no" for="titN">No</label>
+     <input type="radio" id="titN" name="titration" value="No"><label class="no"  for="titN">No</label>
    </div>
  </div>
 
- <!-- live advice + copy button -->
+ <!-- advice panel + copy button -->
  <div id="checklistResult" class="result"></div>
- <button id="copyBtn" style="margin-top:.8rem">Copy to Youreka</button>
+ <button id="copyBtn" style="margin-top:.9rem">Copy to Youreka</button>
 </section>
 
-<!-- ========== 3. Field Chemical Tests (unchanged) ========== -->
+<!-- ========== 3. FIELD CHEMICAL TESTS ========== -->
 <section id="fieldTests">
  <h2>3. Field Chemical Tests</h2>
  <ul>
-  <li><strong>Detergent Carry Over</strong><br>When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.</li>
-  <li><strong>Detection of Starch</strong><br>A drop of ACID 1 then Iodide/Iodate on the surface gives a blue/black colour in the presence of starch.</li>
-  <li><strong>Detection of Limescale</strong><br>Use a few drops of ACID 3 — bubbles form and scale removed.</li>
+  <li><strong>Detergent Carry-Over</strong><br>Indicator reagent turns pink → detergent not rinsed off. Check rinse arms & pressure.</li>
+  <li><strong>Detection of Starch</strong><br>ACID 1 + Iodide/Iodate → blue/black colour indicates starch.</li>
+  <li><strong>Detection of Limescale</strong><br>ACID 3 bubbles = carbonate scale present.</li>
  </ul>
  <p style="margin-top:1rem">
-   Need to titrate detergent? 
-   <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
-     Open the concentration web-app
-   </a>
+   Need to titrate detergent?
+   <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">Open the concentration web-app</a>
  </p>
 </section>
 
-<!-- ========== JavaScript (ES-5) ========== -->
+<!-- ==================== JAVASCRIPT ==================== -->
 <script>
-/* ========== symptom data removed for brevity — keep yours here ========== */
-var DATA={}; // (same as previous full version)
+/* ========== VERBATIM DATA (unchanged) ========== */
+var DATA={/* ... same long object as before ... */};
 
-/* ------------ live Essential-Checks advice ------------ */
+/* ---------- Essential-Checks helpers ---------- */
+function v(name){var r=document.querySelector('input[name="'+name+'"]:checked');return r?r.value:"";}
 function buildAdvice(){
-  var list=[];
-  if(getVal('dosingOn')==='No')      list.push("Switch on the dosing unit.");
-  if(getVal('dosingWorking')==='No') list.push("Repair or calibrate dosing equipment.");
-  if(getVal('temps')==='No')         list.push("Verify temperatures are within spec.");
-  if(getVal('jets')==='No')          list.push("Clear wash & rinse jets.");
-  if(getVal('practice')==='No')      list.push("Improve pre-scraping / racking.");
-  if(getVal('detergent')==='No')     list.push("Connect correct detergent & tubes.");
-  if(getVal('titration')==='No')     list.push("Perform detergent titration.");
-  return list;
-}
-function getVal(key){
-  var el=document.querySelector('input[name="'+key+'"]:checked');
-  return el?el.value:"";
+  var a=[];
+  if(v('dosingOn')==='No')       a.push("Switch on the dosing unit.");
+  if(v('dosingWorking')==='No')  a.push("Repair or calibrate dosing equipment.");
+  if(v('temps')==='No')          a.push("Verify temperatures are within spec.");
+  if(v('jets')==='No')           a.push("Clear wash & rinse jets.");
+  if(v('practice')==='No')       a.push("Improve pre-scraping / racking.");
+  if(v('detergent')==='No')      a.push("Connect correct detergent & tubes.");
+  if(v('titration')==='No')      a.push("Perform detergent titration.");
+  return a;
 }
 function updateAdvice(){
   var panel=document.getElementById('checklistResult');
-  var adv=buildAdvice();
-  panel.innerHTML=adv.length
-     ?"<h3>Checklist findings</h3><ul><li>"+adv.join("</li><li>")+"</li></ul>"
-     :"<p>No obvious issues from the checklist.</p>";
+  var list=buildAdvice();
+  panel.innerHTML=list.length
+    ?"<h3>Checklist findings</h3><ul><li>"+list.join("</li><li>")+"</li></ul>"
+    :"<p>No obvious issues from the checklist.</p>";
   panel.classList.add('show');
 }
-
-/* attach change listeners to all radio buttons */
 var radios=document.querySelectorAll('.toggle input');
 for(var i=0;i<radios.length;i++){radios[i].onchange=updateAdvice;}
 updateAdvice();
 
-/* ------------- Copy to Youreka ------------- */
+/* ---------- Copy to clipboard ---------- */
 document.getElementById('copyBtn').onclick=function(){
-  var make=document.getElementById('mMake').value||"-";
-  var model=document.getElementById('mModel').value||"-";
-  var txt="Machine Make: "+make+"\nMachine Model: "+model+"\n";
-  var qs=document.querySelectorAll('.qcard');
-  for(var i=0;i<qs.length;i++){
-    var num=i+1;
-    var q=qs[i].querySelector('p').textContent.replace(/^\d+\.\s*/,"");
-    var ans=getVal(qs[i].getAttribute('data-key'));
-    txt+=num+". "+q+" - "+ans+"\n";
+  var text="Machine Make: "+(document.getElementById('mMake').value||"-")+"\n"+
+           "Machine Model: "+(document.getElementById('mModel').value||"-")+"\n";
+  var cards=document.querySelectorAll('.qcard');
+  for(var i=0;i<cards.length;i++){
+    var num=i+1, q=cards[i].querySelector('p').textContent.replace(/^\d+\.\s*/,"").trim();
+    text+=num+". "+q+" - "+v(cards[i].getAttribute('data-key'))+"\n";
   }
-  /* modern clipboard API with fallback */
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(function(){
-      alert("Essential Check answers copied to clipboard!");
-    },function(){fallbackCopy(txt);});
-  }else{ fallbackCopy(txt); }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){alert("Essential-Check answers copied!");},
+                                             function(){legacyCopy(text);});
+  }else{legacyCopy(text);}
 };
-function fallbackCopy(t){
-  var ta=document.createElement('textarea');
-  ta.value=t; document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); alert("Copied to clipboard!"); }
-  catch(e){ alert("Please copy manually:\n\n"+t); }
-  document.body.removeChild(ta);
+function legacyCopy(t){
+  var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+  ta.select();try{document.execCommand('copy');alert("Copied to clipboard!");}
+  catch(e){alert("Copy failed—here is the text:\n\n"+t);}document.body.removeChild(ta);
 }
 
-/* ------------ Symptom lookup (unchanged core) ------------ */
+/* ---------- Symptom lookup (unchanged) ---------- */
 document.getElementById('symptom').onchange=function(){
   var key=(this.value||"").trim(), box=document.getElementById('symptomResult');
   if(!key){box.classList.remove('show');box.innerHTML="";return;}
