@@ -3,84 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dishwasher Troubleshooting Helper (enhanced)</title>
+<title>Dishwasher Troubleshooting Helper — full source data</title>
 <style>
-/* ============ design tokens ============ */
-:root{
-  --bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;
-  --sep:rgba(0,0,0,.08);--sevHi:#c62828;--sevMed:#ef6c00;
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;
-    --sep:rgba(255,255,255,.08);--sevHi:#ff5252;--sevMed:#ffa726;
-  }
-}
-/* ============ base ============ */
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.45;padding-top:3.1rem}
-h1{margin:.3rem 0 1rem}
-section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin:1rem 1rem 1.6rem}
-label{font-weight:600}
-select,button,input[type=text]{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px;border:1px solid var(--sep)}
-select{width:100%}
-button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
-button:hover{opacity:.9}
-input[type=text]{width:100%}
-/* ============ sticky nav bar ============ */
-#topNav{
-  position:fixed;left:0;top:0;width:100%;background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.15);
-  display:flex;gap:.8rem;padding:.5rem 1rem;z-index:999
-}
-#topNav a{color:var(--accent);font-weight:600;text-decoration:none;font-size:.92rem}
-#topNav a:hover{text-decoration:underline}
-/* ============ result panels ============ */
-.result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
-.result.show{display:block}
-/* ============ checklist table ============ */
-table{width:100%;border-collapse:collapse;margin-top:.5rem}
-th,td{padding:.45rem .6rem;text-align:left}
-tr:nth-child(even){background:#f0f4f8}
-th{background:#eaf2fd}
-#checklistForm thead{display:none}
-/* ============ severity styles ============ */
-.sev-high{color:var(--sevHi);font-weight:600}
-.sev-med {color:var(--sevMed);font-weight:600}
-/* ============ field tests ============ */
-#fieldTests ul{list-style:none;padding:0;margin:0}
-#fieldTests li{padding:.9rem 0;border-bottom:1px solid var(--sep);display:flex;align-items:flex-start;gap:.75rem}
-#fieldTests li:last-child{border:none}
-#fieldTests img{flex:0 0 38px;height:38px}
-#fieldTests strong{display:block;margin-bottom:.35rem}
-/* ============ mobile tweaks ============ */
-@media (max-width:640px){
-  body{padding-top:4rem}
-  h1{font-size:1.35rem;margin:.4rem 0 1rem}
-  section{margin:1rem .5rem 1.6rem}
-  table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none}
-  tr{margin-bottom:1rem;border-bottom:1px solid var(--sep);padding-bottom:.6rem}
-  tr:nth-child(even){background:transparent}
-  td{padding:.25rem 0}td:first-child{font-weight:600}
-  button{width:100%;margin-top:.9rem}.result{padding-left:.7rem}
-}
+ :root{--bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;--sep:rgba(0,0,0,.08)}
+ @media (prefers-color-scheme:dark){
+   :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;--sep:rgba(255,255,255,.08)}
+ }
+ *{box-sizing:border-box}
+ body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
+ h1{margin:.2rem 0 1rem}
+ section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
+ label{font-weight:600}
+ select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
+ select{width:100%}
+ button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
+ button:hover{opacity:.9}
+ .result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
+ .result.show{display:block}
+
+ /* checklist table */
+ table{width:100%;border-collapse:collapse;margin-top:.5rem}
+ th,td{padding:.45rem .6rem;text-align:left}
+ th{background:#eaf2fd}
+ tr:nth-child(even){background:#f0f4f8}
+
+ /* permanently hide the heading row */
+ #checklistForm thead{display:none}
+
+ /* field test list */
+ #fieldTests ul{list-style:none;padding:0;margin:0}
+ #fieldTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
+ #fieldTests li:last-child{border:none}
+ #fieldTests strong{display:block;margin-bottom:.3rem}
+
+ /* mobile tweaks */
+ @media (max-width:640px){
+   body{padding:.6rem}h1{font-size:1.35rem}h2{font-size:1.15rem;margin:.25rem 0 .7rem}
+   table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none} /* keeps header hidden on mobile too */
+   tr{margin-bottom:1rem;border-bottom:1px solid var(--sep);padding-bottom:.6rem}
+   tr:nth-child(even){background:transparent}td{padding:.25rem 0}td:first-child{font-weight:600}
+   button{width:100%;margin-top:.9rem}.result{padding-left:.7rem}
+ }
 </style>
 </head>
 <body>
 
-<!-- ========= sticky nav ========== -->
-<nav id="topNav">
- <a href="#symLookup">Quick Lookup</a>
- <a href="#checklist">Checklist</a>
- <a href="#fieldTests">Chemical Tests</a>
-</nav>
-
 <h1>Dishwasher Troubleshooting Helper</h1>
 
 <!-- ========== 1. Quick Symptom Lookup ========== -->
-<section id="symLookup">
+<section>
  <h2>1. Quick Symptom Lookup</h2>
- <input id="symSearch" type="text" placeholder="Type to filter symptoms…">
- <label for="symptom" style="display:none">Symptom</label>
+ <label for="symptom">Observed symptom or issue:</label>
  <select id="symptom">
   <option value="">-- choose symptom --</option>
   <option value="Tannin Stains">Tannin stains (tea / coffee / wine)</option>
@@ -104,11 +77,13 @@ th{background:#eaf2fd}
 </section>
 
 <!-- ========== 2. Machine / Practice Checklist ========== -->
-<section id="checklist">
+<section>
  <h2>2. Machine / Practice Checklist</h2>
  <form id="checklistForm">
   <table>
-   <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+   <thead>
+    <tr><th>Question</th><th>Answer</th></tr>
+   </thead>
    <tbody>
     <tr><td>Is the dosing equipment <strong>switched on</strong>?</td><td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
     <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td><td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
@@ -121,6 +96,7 @@ th{background:#eaf2fd}
   </table>
   <button type="button" id="evaluateBtn">Evaluate Checklist</button>
  </form>
+
  <div id="checklistResult" class="result"></div>
 </section>
 
@@ -128,27 +104,12 @@ th{background:#eaf2fd}
 <section id="fieldTests">
  <h2>3. Field Chemical Tests</h2>
  <ul>
-  <li>
-    <img alt="pink test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZTkxZTYzIi8+PC9zdmc+">
-    <div>
-     <strong>Detergent Carry Over</strong><br>
-     When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.
-    </div>
-  </li>
-  <li>
-    <img alt="blue-black test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMWEyMzdlIi8+PC9zdmc+">
-    <div>
-     <strong>Detection of Starch</strong><br>
-     A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.
-    </div>
-  </li>
-  <li>
-    <img alt="lime-scale test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjOGJjMzRhIi8+PC9zdmc+">
-    <div>
-     <strong>Detection of Limescale</strong><br>
-     Use a few drops of ACID 3 on the item — bubbles form and scale is removed.
-    </div>
-  </li>
+  <li><strong>Detergent Carry Over</strong><br>
+      When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.</li>
+  <li><strong>Detection of Starch</strong><br>
+      A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.</li>
+  <li><strong>Detection of Limescale</strong><br>
+      Use a few drops of ACID 3 on the item — bubbles form and scale is removed.</li>
  </ul>
  <p style="margin-top:1rem">
   Need to titrate detergent?&nbsp;
@@ -158,37 +119,102 @@ th{background:#eaf2fd}
 
 <!-- ========== JavaScript ========== -->
 <script>
-/* ========== original verbatim data ========== */
-const DATA={/* (unchanged JSON object, omitted for brevity: same as previous answer) */};
+/* --- verbatim symptom data --- */
+const DATA={
+ "Tannin Stains":{
+  causes:"Tea or coffee and wine. Worse where glaze has eroded.",
+  consequences:"",
+  actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glasswashers."
+ },
+ "Starch":{
+  causes:"Heated plates, long delays, greasy sticky foods, low detergent level, poor wash pressure, poor wash temperatures.",
+  consequences:"",
+  actions:"Increase detergent level, change to a more alkaline detergent, improve practices, improve temperatures, increase wash pressure."
+ },
+ "Foaming":{
+  causes:"Low wash/rinse temperature, hand dishwashing detergents contaminating wash, high food soiling, high wash tank water level, poor rinse.",
+  consequences:"",
+  actions:"Increase temperature, reduce rinse aid level, remove problem detergents, improve draining, and remove high foam product."
+ },
+ "Drying Marks":{
+  causes:"No or poor performance from rinse, low rinse aid level, low rinse temperature, high rinse temperature, hard water, high dissolved solids, poor racking.",
+  consequences:"",
+  actions:"Repair dishwasher, increase rinse aid level, lower, or raise rinse temperature, use hard water rinse aid, in extreme cases use a de-ioniser, improve racking procedure."
+ },
+ "Detergent Overuse":{
+  causes:"Broken equipment (Diversey or machine) leaking drain, too high set point, scaled up probe, broken fill valve, jammed solenoid (for powders).",
+  consequences:"",
+  actions:"Repair or replace broken equipment, descale, and clean probe, reduce set point, ensure detergent level is correct for water hardness, ensure that solenoid is not jammed open."
+ },
+ "Limescale":{
+  causes:"No/broken water softener, incorrect detergent level, incorrect rinse aid.",
+  consequences:"",
+  actions:"Repair water softener, increase detergent level, move to hard water detergent, and rinse aid."
+ },
+ "Cracking Plastic":{
+  causes:"Excessive heat, non-ionic based hand dishwashing detergent, some rinse aids, very high levels of available chlorine.",
+  consequences:"",
+  actions:"Reduce temperatures on rinse section, remove any problem chemicals, use plastic safe products A11, A8, remove sources of chlorine as far as possible."
+ },
+ "Bits After Rinsing":{
+  causes:"Poor or broken machine rinse, dirty wash water, contaminated rinse water, coffee grounds and tea bags, poor racking.",
+  consequences:"",
+  actions:"Repair dishwasher, change wash water and clean out dishwasher, improve pre-scrapping operation, improve rinse water supply, improve racking."
+ },
+ "Detergent Carryover":{
+  causes:"Poor or broken machine rinse, very high detergent level, poor rinse pressure.",
+  consequences:"",
+  actions:"Repair dishwasher, reduce detergent level, increase rinse pressure, clear rinse jets."
+ },
+ "Cloudy Glasses":{
+  causes:"Hard water scale, detergent carryover, detergent level too high, high-water solids.",
+  consequences:"",
+  actions:"Increase detergent level, improve rinse pressure and temperature, reduce detergent level, suggest water softener is installed where needed."
+ },
+ "Rusty Cutlery":{
+  causes:"Prolonged soaking in any solution, contact with salt or chlorinated product at high concentration.",
+  consequences:"",
+  actions:"Improve operation, remove, or reduce sources of chlorine, upgrade cutlery."
+ },
+ "Black SS Cutlery":{
+  causes:"Silver dip, heat.",
+  consequences:"",
+  actions:"Do not bring stainless steel into contact with Suma Silver D8 or heat."
+ },
+ "Silver Tarnishing":{
+  causes:"Sulphides from eggs and other foods or from fires of any sort, chlorine from any source, excessive heat.",
+  consequences:"",
+  actions:"Remove the source of sulphides and chlorine and heat as far as possible, burnish to restore original appearance."
+ },
+ "Machine Scaled":{
+  causes:"In hard water areas, if insufficient detergent is present hard water scale (limestone) can form.",
+  consequences:"Porous scale in the machine can harbour bacteria, hygiene at risk / Wash results, especially cups, will be poor, customer dissatisfaction is likely. Cups will have to be soaked in Tannin Remover, taking time and cost. Heater elements will scale and become more inefficient; energy cost will rise.",
+  actions:"Put salt in the softener. Make sure detergent is available. Descale machine with a Limescale Remover."
+ },
+ "Wash Jets Blocked":{
+  causes:"The machine cleans by continuously passing wash water through the jets and onto the dirty plates. If the jets are blocked, then no water can pass. The jets are susceptible to debris getting caught.",
+  consequences:"Poor cleaning, customers may get dirty plates. Plates will have to be rewashed, taking time and cost.",
+  actions:"Before every wash clean out all the wash jets. Poke out stuck debris and flush with water. Remove the arms to do a thorough job."
+ }
+};
 
-/* ========== helper functions ========== */
-const HIGH = 'sev-high', MED = 'sev-med';
-function advice(o){
-  const list=[];
-  if(o.dosingOn==="No")       list.push([HIGH,"Switch on the dosing unit."]);
-  if(o.dosingWorking==="No")  list.push([HIGH,"Repair or calibrate dosing equipment."]);
-  if(o.temps==="No")          list.push([MED ,"Re-check temperatures."]);
-  if(o.jets==="No")           list.push([HIGH,"Clear wash & rinse jets."]);
-  if(o.practice==="No")       list.push([MED ,"Improve pre-scraping and racking."]);
-  if(o.detergent==="No")      list.push([MED ,"Connect correct detergent."]);
-  if(o.titration==="No")      list.push([MED ,"Perform detergent titration."]);
-  return list;
+/* checklist helper */
+function advise(o){
+ const a=[];
+ if(o.dosingOn==="No")       a.push("Switch on the dosing unit.");
+ if(o.dosingWorking==="No")  a.push("Repair or calibrate dosing equipment.");
+ if(o.temps==="No")          a.push("Re-check temperatures.");
+ if(o.jets==="No")           a.push("Clear wash & rinse jets.");
+ if(o.practice==="No")       a.push("Improve pre-scraping and racking.");
+ if(o.detergent==="No")      a.push("Connect correct detergent.");
+ if(o.titration==="No")      a.push("Perform detergent titration.");
+ return a;
 }
 
-/* ========== DOM ready ========== */
+/* DOM ready */
 document.addEventListener("DOMContentLoaded",()=>{
-
- /* --- 2 · live search filter --- */
- const sel  = document.getElementById('symptom');
- document.getElementById('symSearch').addEventListener('input',e=>{
-   const q=e.target.value.toLowerCase();
-   [...sel.options].forEach(o=>{
-     o.style.display = q && !o.text.toLowerCase().includes(q) ? 'none' : '';
-   });
- });
-
- /* --- symptom lookup --- */
- sel.addEventListener('change',e=>{
+ /* symptom lookup */
+ document.getElementById("symptom").addEventListener("change",e=>{
    const key=(e.target.value||"").trim(), box=document.getElementById("symptomResult");
    if(!key){box.classList.remove("show");box.innerHTML="";return;}
    const d=DATA[key]; if(!d){box.classList.remove("show");return;}
@@ -196,22 +222,16 @@ document.addEventListener("DOMContentLoaded",()=>{
      `<p><strong>Causes:</strong> ${d.causes}</p>`+
      (d.consequences?`<p><strong>Consequences:</strong> ${d.consequences}</p>`:"")+
      `<p><strong>Possible solutions:</strong> ${d.actions}</p>`;
-   box.classList.add("show");
-   box.scrollIntoView({behavior:"smooth",block:"start"});
- });
-
- /* --- checklist evaluate (3 colours) --- */
- document.getElementById("evaluateBtn").addEventListener("click",()=>{
-   const fd=new FormData(document.getElementById("checklistForm")), o={}; fd.forEach((v,k)=>o[k]=v);
-   const list=advice(o), box=document.getElementById("checklistResult");
-   if(list.length){
-     box.innerHTML="<h3>Checklist findings</h3><ul>"+list.map(([cls,msg])=>`<li class="${cls}">${msg}</li>`).join("")+"</ul>";
-   }else{
-     box.innerHTML="<p>No obvious issues from the checklist.</p>";
-   }
    box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
  });
 
+ /* checklist */
+ document.getElementById("evaluateBtn").addEventListener("click",()=>{
+   const fd=new FormData(document.getElementById("checklistForm")), o={}; fd.forEach((v,k)=>o[k]=v);
+   const list=advise(o), box=document.getElementById("checklistResult");
+   box.innerHTML=list.length?`<h3>Checklist findings</h3><ul><li>${list.join("</li><li>")}</li></ul>`:"<p>No obvious issues from the checklist.</p>`;
+   box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
+ });
 });
 </script>
 </body>
