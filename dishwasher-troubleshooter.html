@@ -17,7 +17,10 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
      background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
-h1{margin:.2rem 0 1rem}
+h1{margin:.2rem 0 .6rem}
+.top-tests{margin-bottom:1.3rem;font-weight:600}
+.top-tests a{color:var(--accent);text-decoration:none}
+.top-tests a:hover{text-decoration:underline}
 section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;
         box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
 label{font-weight:600}
@@ -36,26 +39,33 @@ button:hover{opacity:.9}
 .toggle input{display:none}
 .toggle label{padding:.34rem .95rem;font-size:.92rem;cursor:pointer;transition:opacity .15s}
 .toggle .yes{background:var(--yes);color:#fff}
-.toggle .no {background:var(--no); color:#fff}
+.toggle .no {background:var(--no);color:#fff}
 .toggle label{opacity:.4}
 .toggle input:checked+label{opacity:1}
 .note{flex:1 1 100%;margin:.4rem 0 0;font-size:.85rem;color:var(--accent)}
 
-/* make / model row */
+/* make / model */
 .mm-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
 .mm-row div{flex:1 1 200px}
 .mm-row input{width:100%;padding:.5rem;border:1px solid var(--sep);border-radius:6px}
 
-/* field tests list */
-#fieldTests ul{list-style:none;margin:0;padding:0}
-#fieldTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
-#fieldTests li:last-child{border:none}
-#fieldTests strong{display:block;margin-bottom:.3rem}
+/* Chemical Tests list */
+#chemTests ul{list-style:none;margin:0;padding:0}
+#chemTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
+#chemTests li:last-child{border:none}
+#chemTests strong{display:block;margin-bottom:.3rem}
 </style>
 </head>
 <body>
 
 <h1>Dishwasher Troubleshooting Helper</h1>
+
+<div class="top-tests">
+  Essential Tests:&nbsp;
+  <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
+    Titration&nbsp;Test
+  </a>
+</div>
 
 <!-- ========= 1. Quick Symptom Lookup ========= -->
 <section>
@@ -79,21 +89,18 @@ button:hover{opacity:.9}
     <option value="Machine Scaled">Machine scaled</option>
     <option value="Wash Jets Blocked">Wash jets blocked</option>
   </select>
-
   <div id="symptomResult" class="result"></div>
 </section>
 
 <!-- ========= 2. Essential Checks ========= -->
 <section>
   <h2>2. Essential Checks</h2>
-
-  <!-- make / model -->
   <div class="mm-row">
     <div><label for="mMake">Machine make</label><input id="mMake"></div>
     <div><label for="mModel">Machine model</label><input id="mModel"></div>
   </div>
 
-  <!-- 7 yes/no cards -->
+  <!-- seven yes/no toggle cards -->
   <div class="qcard" data-key="dosingOn">
     <p>1.&nbsp;Is the dosing equipment <strong>switched on</strong>?</p>
     <div class="toggle">
@@ -114,7 +121,7 @@ button:hover{opacity:.9}
       <input type="radio" id="tempsY" name="temps" value="Yes" checked><label class="yes" for="tempsY">Yes</label>
       <input type="radio" id="tempsN" name="temps" value="No"><label class="no" for="tempsN">No</label>
     </div>
-    <div class="note">Pref: 40-55 °C pre-wash · 55-65 °C wash · 80-90 °C rinse · 60-70 °C low-temp</div>
+    <div class="note">Pref 40-55 °C pre-wash · 55-65 °C wash · 80-90 °C rinse · 60-70 °C low-temp</div>
   </div>
   <div class="qcard" data-key="jets">
     <p>4.&nbsp;Is the machine working correctly, with all wash and rinse jets clear?</p>
@@ -149,106 +156,107 @@ button:hover{opacity:.9}
   <button id="copyBtn" style="margin-top:.9rem">Copy to Youreka</button>
 </section>
 
-<!-- ========= 3. Field Chemical Tests ========= -->
-<section id="fieldTests">
-  <h2>3. Field Chemical Tests</h2>
+<!-- ========= 3. Chemical Tests ========= -->
+<section id="chemTests">
+  <h2>3. Chemical Tests</h2>
   <ul>
-    <li><strong>Detergent Carry-Over</strong> – Indicator reagent turns pink → detergent not rinsed off properly.</li>
-    <li><strong>Detection of Starch</strong> – ACID 1 + Iodide/Iodate → blue/black colour = starch.</li>
-    <li><strong>Detection of Limescale</strong> – ACID 3 bubbles → carbonate scale present.</li>
+    <li>
+      <strong>Detecting Detergent Carry Over&nbsp;:</strong><br>
+      Add <em>Indicator Reagent</em> to dishes or glassware. A pink colour means alkali (detergent) is still present.<br>
+      <em>Check that rinse arms are clear and the rinse cycle is working.</em>
+    </li>
+    <li>
+      <strong>Detecting Starch&nbsp;:</strong><br>
+      Place a drop of <em>ACID 1</em> solution on the surface, followed by a drop of <em>Iodide/Iodate</em>. A blue-black colour shows starch.
+    </li>
+    <li>
+      <strong>Detecting Limescale&nbsp;:</strong><br>
+      Add a few drops of <em>ACID 3</em> to the suspect area. Bubbling indicates carbonate scale, which the acid removes.
+    </li>
   </ul>
 </section>
 
 <!-- ================= JavaScript ================= -->
 <script>
-/* ------------- DATA for section 1 ------------- */
+/* -------- DATA for symptom lookup -------- */
 var DATA={
- "Tannin Stains":{causes:"Tea or coffee and wine. Worse where glaze has eroded.",
-  consequences:"",actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glass-washers."},
+ "Tannin Stains":{causes:"Tea or coffee and wine. Worse where glaze has eroded.",consequences:"",
+  actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glass-washers."},
  "Starch":{causes:"Heated plates, long delays, greasy sticky foods, low detergent level, poor wash pressure, poor wash temperatures.",
-  consequences:"",actions:"Increase detergent level, switch to a more alkaline detergent, improve practices, raise temperatures, increase wash pressure."},
- "Foaming":{causes:"Low wash/rinse temperature, hand dish detergents in the tank, high food soiling, high wash-tank level, poor rinse.",
-  consequences:"",actions:"Raise temperature, reduce rinse-aid dose, remove problem detergents, improve drainage, eliminate high-foam products."},
- "Drying Marks":{causes:"Poor rinse, low rinse-aid, incorrect rinse temperature, hard water, high solids, poor racking.",
-  consequences:"",actions:"Repair rinse, adjust rinse-aid, set correct temperature, use hard-water rinse-aid or de-ioniser, improve racking."},
- "Detergent Overuse":{causes:"Broken dosing gear, too-high set-point, scaled probe, broken fill valve, jammed solenoid.",
-  consequences:"",actions:"Repair gear, descale & clean probe, lower set-point, match dose to water hardness, free solenoid."},
- "Limescale":{causes:"No/broken softener, low detergent, wrong rinse-aid.",
-  consequences:"",actions:"Repair softener, increase detergent, use hard-water detergent and rinse-aid."},
- "Cracking Plastic":{causes:"Excess heat, non-ionic hand detergent, some rinse-aids, very high chlorine.",
-  consequences:"",actions:"Lower rinse temperature, remove problem chemicals, use plastic-safe products A11/A8, reduce chlorine sources."},
- "Bits After Rinsing":{causes:"Poor rinse, dirty wash water, contaminated rinse water, coffee grounds, poor racking.",
+  consequences:"",actions:"Increase detergent level, use a more alkaline detergent, improve practices, raise temperatures, increase wash pressure."},
+ "Foaming":{causes:"Low wash/rinse temperature, hand-dish detergents in tank, high food soil, high water level, poor rinse.",
+  consequences:"",actions:"Raise temperature, lower rinse-aid dose, remove problem detergents, improve drainage, eliminate high-foam products."},
+ "Drying Marks":{causes:"Poor rinse, low rinse-aid, wrong rinse temperature, hard water, high solids, poor racking.",
+  consequences:"",actions:"Repair rinse system, adjust rinse-aid, correct temperature, use hard-water rinse-aid or de-ioniser, improve racking."},
+ "Detergent Overuse":{causes:"Broken dosing gear, high set-point, scaled probe, broken fill valve, jammed solenoid.",
+  consequences:"",actions:"Repair dosing gear, descale/clean probe, lower set-point, match dose to hardness, free solenoid."},
+ "Limescale":{causes:"No/broken softener, low detergent, wrong rinse-aid.",consequences:"",
+  actions:"Repair softener, raise detergent, switch to hard-water detergent and rinse-aid."},
+ "Cracking Plastic":{causes:"Excess heat, non-ionic hand detergent, some rinse-aids, very high chlorine.",consequences:"",
+  actions:"Lower rinse temperature, remove problem chemicals, use plastic-safe products A11/A8, reduce chlorine."},
+ "Bits After Rinsing":{causes:"Poor rinse, dirty wash water, contaminated rinse water, coffee grounds/tea bags, poor racking.",
   consequences:"",actions:"Repair rinse, change wash water, improve pre-scraping, flush rinse supply, improve racking."},
- "Detergent Carryover":{causes:"Poor rinse, very high detergent, low rinse pressure.",
-  consequences:"",actions:"Repair rinse, lower detergent, raise rinse pressure, clear jets."},
- "Cloudy Glasses":{causes:"Hard-water scale, detergent carry-over, high detergent, high solids.",
-  consequences:"",actions:"Increase detergent (if too low), improve rinse pressure/temperature, reduce detergent, install softener if needed."},
- "Rusty Cutlery":{causes:"Prolonged soaking, contact with salt or chlorinated products.",
-  consequences:"",actions:"Shorten soak time, rinse quickly, remove chlorine source, upgrade cutlery quality."},
- "Black SS Cutlery":{causes:"Silver-dip contact, heat.",
-  consequences:"",actions:"Keep stainless steel away from Suma Silver D8 and excessive heat."},
- "Silver Tarnishing":{causes:"Sulphides from foods/fires, chlorine, excessive heat.",
-  consequences:"",actions:"Remove sulphides & chlorine, reduce heat, burnish to restore."},
- "Machine Scaled":{causes:"Hard-water scale forms when detergent is insufficient.",
-  consequences:"Porous scale harbours bacteria; wash quality drops; energy cost rises.",
-  actions:"Add salt to softener, ensure detergent present, descale with limescale remover."},
- "Wash Jets Blocked":{causes:"Debris blocks jets; water cannot pass.",
-  consequences:"Poor cleaning; plates must be rewashed.",
+ "Detergent Carryover":{causes:"Poor rinse, very high detergent, low rinse pressure.",consequences:"",
+  actions:"Repair rinse, reduce detergent, increase rinse pressure, clear jets."},
+ "Cloudy Glasses":{causes:"Hard-water scale, detergent carry-over, excess detergent, high solids.",consequences:"",
+  actions:"Increase detergent (if low), improve rinse pressure/temperature, reduce detergent, install softener if needed."},
+ "Rusty Cutlery":{causes:"Prolonged soaking, contact with salt or chlorinated products.",consequences:"",
+  actions:"Reduce soak time, rinse quickly, remove chlorine, upgrade cutlery."},
+ "Black SS Cutlery":{causes:"Silver dip, heat.",consequences:"",
+  actions:"Keep stainless steel away from Suma Silver D8 and excessive heat."},
+ "Silver Tarnishing":{causes:"Sulphides from foods/fires, chlorine, excessive heat.",consequences:"",
+  actions:"Remove sulphides & chlorine, reduce heat, burnish silver."},
+ "Machine Scaled":{causes:"Hard-water scale forms when detergent is insufficient.",consequences:"Porous scale harbours bacteria; wash quality drops; energy cost rises.",
+  actions:"Add salt to softener, ensure detergent, descale with limescale remover."},
+ "Wash Jets Blocked":{causes:"Debris blocks jets; water cannot pass.",consequences:"Poor cleaning; plates must be rewashed.",
   actions:"Clean jets before every wash; poke debris & flush; remove arms for thorough clean."}
 };
 
-/* ------------- helpers for section 2 ------------- */
-function radioVal(name){
-  var r=document.querySelector('input[name="'+name+'"]:checked');
-  return r ? r.value : "";
-}
-function buildAdvice(){
-  var a=[];
-  if(radioVal('dosingOn')==='No')       a.push("Switch on dosing unit.");
-  if(radioVal('dosingWorking')==='No')  a.push("Repair/calibrate dosing equipment.");
-  if(radioVal('temps')==='No')          a.push("Verify temperatures.");
-  if(radioVal('jets')==='No')           a.push("Clear wash & rinse jets.");
-  if(radioVal('practice')==='No')       a.push("Improve pre-scraping/racking.");
-  if(radioVal('detergent')==='No')      a.push("Connect correct detergent & tubes.");
-  if(radioVal('titration')==='No')      a.push("Perform detergent titration.");
-  return a;
-}
-function refreshAdvice(){
-  var out=document.getElementById('checklistResult'), list=buildAdvice();
-  out.innerHTML = list.length ?
-      "<h3>Checklist findings</h3><ul><li>"+list.join("</li><li>")+"</li></ul>"
-    : "<p>No obvious issues from the checklist.</p>";
-  out.classList.add('show');
-}
-document.querySelectorAll('.toggle input').forEach(inp=>inp.addEventListener('change',refreshAdvice));
-refreshAdvice();
-
-/* --------- copy to clipboard --------- */
-document.getElementById('copyBtn').addEventListener('click',function(){
-  var txt="Machine Make: "+(document.getElementById('mMake').value||"-")+"\n"+
-          "Machine Model: "+(document.getElementById('mModel').value||"-")+"\n";
-  document.querySelectorAll('.qcard').forEach((card,i)=>{
-    var q=card.querySelector('p').textContent.replace(/^\d+\.\s*/,"").trim();
-    txt+=(i+1)+". "+q+" - "+radioVal(card.dataset.key)+"\n";
-  });
-  navigator.clipboard?.writeText(txt).then(()=>alert("Copied!"))
-  .catch(()=>{ /* fallback for older browsers */
-    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);
-    ta.select();try{document.execCommand('copy');alert("Copied!");}catch(e){alert(txt);}
-    document.body.removeChild(ta);
-  });
+/* ---- lookup handler ---- */
+document.getElementById('symptom').addEventListener('change',e=>{
+  const key=e.target.value.trim(), box=document.getElementById('symptomResult');
+  if(!key){box.classList.remove('show');box.innerHTML="";return;}
+  const d=DATA[key];
+  if(!d){box.classList.remove('show');box.innerHTML="<em>No data found</em>";return;}
+  box.innerHTML=`<p><strong>Causes:</strong> ${d.causes}</p>`+
+                (d.consequences?`<p><strong>Consequences:</strong> ${d.consequences}</p>`:"")+
+                `<p><strong>Possible solutions:</strong> ${d.actions}</p>`;
+  box.classList.add('show');
 });
 
-/* --------- symptom lookup --------- */
-document.getElementById('symptom').addEventListener('change',function(){
-  var key=this.value.trim(), box=document.getElementById('symptomResult');
-  if(!key){box.classList.remove('show');box.innerHTML="";return;}
-  var d=DATA[key];
-  if(!d){box.classList.remove('show');box.innerHTML="<em>No data found</em>";return;}
-  box.innerHTML="<p><strong>Causes:</strong> "+d.causes+"</p>"+
-                (d.consequences? "<p><strong>Consequences:</strong> "+d.consequences+"</p>":"")+
-                "<p><strong>Possible solutions:</strong> "+d.actions+"</p>";
-  box.classList.add('show');box.scrollIntoView({behavior:'smooth',block:'start'});
+/* ---- essential-check advice ---- */
+const advise=()=>{
+  const v=n=>document.querySelector(`input[name="${n}"]:checked`).value;
+  const list=[];
+  if(v('dosingOn')==='No')       list.push("Switch on dosing unit.");
+  if(v('dosingWorking')==='No')  list.push("Repair/calibrate dosing unit.");
+  if(v('temps')==='No')          list.push("Verify temperatures.");
+  if(v('jets')==='No')           list.push("Clear wash & rinse jets.");
+  if(v('practice')==='No')       list.push("Improve pre-scraping/racking.");
+  if(v('detergent')==='No')      list.push("Connect correct detergent & tubes.");
+  if(v('titration')==='No')      list.push("Perform detergent titration.");
+  const out=document.getElementById('checklistResult');
+  out.innerHTML=list.length?`<h3>Checklist findings</h3><ul><li>${list.join('</li><li>')}</li></ul>`
+                           :"<p>No obvious issues from the checklist.</p>";
+  out.classList.add('show');
+};
+document.querySelectorAll('.toggle input').forEach(i=>i.addEventListener('change',advise));
+advise();
+
+/* ---- copy button ---- */
+document.getElementById('copyBtn').addEventListener('click',()=>{
+  const get=v=>document.querySelector(`input[name="${v}"]:checked`).value;
+  let txt=`Machine Make: ${document.getElementById('mMake').value||"-"}\n`;
+  txt+=`Machine Model: ${document.getElementById('mModel').value||"-"}\n`;
+  document.querySelectorAll('.qcard').forEach((c,i)=>{
+    const q=c.querySelector('p').textContent.replace(/^\d+\.\s*/,"").trim();
+    txt+=`${i+1}. ${q} - ${get(c.dataset.key)}\n`;
+  });
+  navigator.clipboard?.writeText(txt).then(()=>alert("Copied!"))
+  .catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);
+    ta.select();document.execCommand('copy');document.body.removeChild(ta);alert("Copied!");
+  });
 });
 </script>
 </body>
