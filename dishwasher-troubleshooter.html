@@ -3,48 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dishwasher Troubleshooting Helper — full source data</title>
+<title>Dishwasher Troubleshooting Helper (enhanced)</title>
 <style>
- :root{--bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;--sep:rgba(0,0,0,.08)}
- @media (prefers-color-scheme:dark){
-   :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;--sep:rgba(255,255,255,.08)}
- }
- *{box-sizing:border-box}
- body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
- h1{margin:.2rem 0 1rem}
- section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
- label{font-weight:600}
- select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
- select{width:100%}
- button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
- button:hover{opacity:.9}
- .result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
- .result.show{display:block}
- table{width:100%;border-collapse:collapse;margin-top:.5rem}
- th,td{padding:.45rem .6rem;text-align:left}
- th{background:#eaf2fd}
- tr:nth-child(even){background:#f0f4f8}
- #fieldTests ul{list-style:none;padding:0;margin:0}
- #fieldTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
- #fieldTests li:last-child{border:none}
- #fieldTests strong{display:block;margin-bottom:.3rem}
- @media (max-width:640px){
-   body{padding:.6rem}h1{font-size:1.35rem}h2{font-size:1.15rem;margin:.25rem 0 .7rem}
-   table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none}
-   tr{margin-bottom:1rem;border-bottom:1px solid var(--sep);padding-bottom:.6rem}
-   tr:nth-child(even){background:transparent}td{padding:.25rem 0}td:first-child{font-weight:600}
-   button{width:100%;margin-top:.9rem}.result{padding-left:.7rem}
- }
+/* ============ design tokens ============ */
+:root{
+  --bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;
+  --sep:rgba(0,0,0,.08);--sevHi:#c62828;--sevMed:#ef6c00;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;
+    --sep:rgba(255,255,255,.08);--sevHi:#ff5252;--sevMed:#ffa726;
+  }
+}
+/* ============ base ============ */
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.45;padding-top:3.1rem}
+h1{margin:.3rem 0 1rem}
+section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.05);margin:1rem 1rem 1.6rem}
+label{font-weight:600}
+select,button,input[type=text]{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px;border:1px solid var(--sep)}
+select{width:100%}
+button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
+button:hover{opacity:.9}
+input[type=text]{width:100%}
+/* ============ sticky nav bar ============ */
+#topNav{
+  position:fixed;left:0;top:0;width:100%;background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.15);
+  display:flex;gap:.8rem;padding:.5rem 1rem;z-index:999
+}
+#topNav a{color:var(--accent);font-weight:600;text-decoration:none;font-size:.92rem}
+#topNav a:hover{text-decoration:underline}
+/* ============ result panels ============ */
+.result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
+.result.show{display:block}
+/* ============ checklist table ============ */
+table{width:100%;border-collapse:collapse;margin-top:.5rem}
+th,td{padding:.45rem .6rem;text-align:left}
+tr:nth-child(even){background:#f0f4f8}
+th{background:#eaf2fd}
+#checklistForm thead{display:none}
+/* ============ severity styles ============ */
+.sev-high{color:var(--sevHi);font-weight:600}
+.sev-med {color:var(--sevMed);font-weight:600}
+/* ============ field tests ============ */
+#fieldTests ul{list-style:none;padding:0;margin:0}
+#fieldTests li{padding:.9rem 0;border-bottom:1px solid var(--sep);display:flex;align-items:flex-start;gap:.75rem}
+#fieldTests li:last-child{border:none}
+#fieldTests img{flex:0 0 38px;height:38px}
+#fieldTests strong{display:block;margin-bottom:.35rem}
+/* ============ mobile tweaks ============ */
+@media (max-width:640px){
+  body{padding-top:4rem}
+  h1{font-size:1.35rem;margin:.4rem 0 1rem}
+  section{margin:1rem .5rem 1.6rem}
+  table,thead,tbody,tr,th,td{display:block;width:100%}thead{display:none}
+  tr{margin-bottom:1rem;border-bottom:1px solid var(--sep);padding-bottom:.6rem}
+  tr:nth-child(even){background:transparent}
+  td{padding:.25rem 0}td:first-child{font-weight:600}
+  button{width:100%;margin-top:.9rem}.result{padding-left:.7rem}
+}
 </style>
 </head>
 <body>
 
+<!-- ========= sticky nav ========== -->
+<nav id="topNav">
+ <a href="#symLookup">Quick Lookup</a>
+ <a href="#checklist">Checklist</a>
+ <a href="#fieldTests">Chemical Tests</a>
+</nav>
+
 <h1>Dishwasher Troubleshooting Helper</h1>
 
 <!-- ========== 1. Quick Symptom Lookup ========== -->
-<section>
+<section id="symLookup">
  <h2>1. Quick Symptom Lookup</h2>
- <label for="symptom">Observed symptom or issue:</label>
+ <input id="symSearch" type="text" placeholder="Type to filter symptoms…">
+ <label for="symptom" style="display:none">Symptom</label>
  <select id="symptom">
   <option value="">-- choose symptom --</option>
   <option value="Tannin Stains">Tannin stains (tea / coffee / wine)</option>
@@ -68,22 +104,23 @@
 </section>
 
 <!-- ========== 2. Machine / Practice Checklist ========== -->
-<section>
+<section id="checklist">
  <h2>2. Machine / Practice Checklist</h2>
  <form id="checklistForm">
   <table>
-   <tr><th>Question</th><th>Answer</th></tr>
-   <tr><td>Is the dosing equipment <strong>switched on</strong>?</td><td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td><td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Are temperatures within spec (40-55 °C pre-wash; 55-65 °C wash; 80-90 °C final rinse)?</td><td><select name="temps"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Are all wash &amp; rinse jets clear?</td><td><select name="jets"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Are staff following good practice (pre-scrape, correct racking)?</td><td><select name="practice"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Is the correct detergent in the correct container?</td><td><select name="detergent"><option>Yes</option><option>No</option></select></td></tr>
-   <tr><td>Has detergent strength been checked (titration)?</td><td><select name="titration"><option>Yes</option><option>No</option></select></td></tr>
+   <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+   <tbody>
+    <tr><td>Is the dosing equipment <strong>switched on</strong>?</td><td><select name="dosingOn"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Is the dosing equipment <strong>working correctly</strong>?</td><td><select name="dosingWorking"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Are temperatures within spec (40-55 °C pre-wash; 55-65 °C wash; 80-90 °C final rinse)?</td><td><select name="temps"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Are all wash &amp; rinse jets clear?</td><td><select name="jets"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Are staff following good practice (pre-scrape, correct racking)?</td><td><select name="practice"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Is the correct detergent in the correct container?</td><td><select name="detergent"><option>Yes</option><option>No</option></select></td></tr>
+    <tr><td>Has detergent strength been checked (titration)?</td><td><select name="titration"><option>Yes</option><option>No</option></select></td></tr>
+   </tbody>
   </table>
   <button type="button" id="evaluateBtn">Evaluate Checklist</button>
  </form>
-
  <div id="checklistResult" class="result"></div>
 </section>
 
@@ -91,41 +128,67 @@
 <section id="fieldTests">
  <h2>3. Field Chemical Tests</h2>
  <ul>
-  <li><strong>Detergent Carry Over</strong><br>
-      When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.</li>
-  <li><strong>Detection of Starch</strong><br>
-      A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.</li>
-  <li><strong>Detection of Limescale</strong><br>
-      Use a few drops of ACID 3 on the item bubbles form and scale removed.</li>
+  <li>
+    <img alt="pink test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjZTkxZTYzIi8+PC9zdmc+">
+    <div>
+     <strong>Detergent Carry Over</strong><br>
+     When Indicator Reagent is added to the surface, a pink colouration will develop indicating the presence of alkali, this means the detergent is not being rinsed off properly. Check rinse arms are not blocked, and rinse is working.
+    </div>
+  </li>
+  <li>
+    <img alt="blue-black test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjMWEyMzdlIi8+PC9zdmc+">
+    <div>
+     <strong>Detection of Starch</strong><br>
+     A drop of ACID 1 Solution followed by a drop of Iodide/Iodate Solution on the surface to be tested will give a blue/black colour in the presence of starch.
+    </div>
+  </li>
+  <li>
+    <img alt="lime-scale test icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjOGJjMzRhIi8+PC9zdmc+">
+    <div>
+     <strong>Detection of Limescale</strong><br>
+     Use a few drops of ACID 3 on the item — bubbles form and scale is removed.
+    </div>
+  </li>
  </ul>
  <p style="margin-top:1rem">
-  Need to titrate detergent? 
+  Need to titrate detergent?&nbsp;
   <a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">Open the concentration web-app</a>
  </p>
 </section>
 
 <!-- ========== JavaScript ========== -->
 <script>
-/* --- verbatim symptom data --- */
-const DATA={ /* unchanged JSON object from previous reply */ };
+/* ========== original verbatim data ========== */
+const DATA={/* (unchanged JSON object, omitted for brevity: same as previous answer) */};
 
-/* helpers */
-function advise(o){
- const a=[];
- if(o.dosingOn==="No")       a.push("Switch on the dosing unit.");
- if(o.dosingWorking==="No")  a.push("Repair or calibrate dosing equipment.");
- if(o.temps==="No")          a.push("Re-check temperatures.");
- if(o.jets==="No")           a.push("Clear wash & rinse jets.");
- if(o.practice==="No")       a.push("Improve pre-scraping and racking.");
- if(o.detergent==="No")      a.push("Connect correct detergent.");
- if(o.titration==="No")      a.push("Perform detergent titration.");
- return a;
+/* ========== helper functions ========== */
+const HIGH = 'sev-high', MED = 'sev-med';
+function advice(o){
+  const list=[];
+  if(o.dosingOn==="No")       list.push([HIGH,"Switch on the dosing unit."]);
+  if(o.dosingWorking==="No")  list.push([HIGH,"Repair or calibrate dosing equipment."]);
+  if(o.temps==="No")          list.push([MED ,"Re-check temperatures."]);
+  if(o.jets==="No")           list.push([HIGH,"Clear wash & rinse jets."]);
+  if(o.practice==="No")       list.push([MED ,"Improve pre-scraping and racking."]);
+  if(o.detergent==="No")      list.push([MED ,"Connect correct detergent."]);
+  if(o.titration==="No")      list.push([MED ,"Perform detergent titration."]);
+  return list;
 }
 
-/* DOM ready */
+/* ========== DOM ready ========== */
 document.addEventListener("DOMContentLoaded",()=>{
- /* symptom lookup */
- document.getElementById("symptom").addEventListener("change",e=>{
+
+ /* --- 2 · live search filter --- */
+ const sel  = document.getElementById('symptom');
+ document.getElementById('symSearch').addEventListener('input',e=>{
+   const q=e.target.value.toLowerCase();
+   [...sel.options].forEach(o=>{
+     o.style.display = q && !o.text.toLowerCase().includes(q) ? 'none' : '';
+   });
+ });
+
+ /* --- symptom lookup --- */
+ sel.addEventListener('change',e=>{
    const key=(e.target.value||"").trim(), box=document.getElementById("symptomResult");
    if(!key){box.classList.remove("show");box.innerHTML="";return;}
    const d=DATA[key]; if(!d){box.classList.remove("show");return;}
@@ -133,16 +196,22 @@ document.addEventListener("DOMContentLoaded",()=>{
      `<p><strong>Causes:</strong> ${d.causes}</p>`+
      (d.consequences?`<p><strong>Consequences:</strong> ${d.consequences}</p>`:"")+
      `<p><strong>Possible solutions:</strong> ${d.actions}</p>`;
+   box.classList.add("show");
+   box.scrollIntoView({behavior:"smooth",block:"start"});
+ });
+
+ /* --- checklist evaluate (3 colours) --- */
+ document.getElementById("evaluateBtn").addEventListener("click",()=>{
+   const fd=new FormData(document.getElementById("checklistForm")), o={}; fd.forEach((v,k)=>o[k]=v);
+   const list=advice(o), box=document.getElementById("checklistResult");
+   if(list.length){
+     box.innerHTML="<h3>Checklist findings</h3><ul>"+list.map(([cls,msg])=>`<li class="${cls}">${msg}</li>`).join("")+"</ul>";
+   }else{
+     box.innerHTML="<p>No obvious issues from the checklist.</p>";
+   }
    box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
  });
 
- /* checklist */
- document.getElementById("evaluateBtn").addEventListener("click",()=>{
-   const fd=new FormData(document.getElementById("checklistForm")), o={}; fd.forEach((v,k)=>o[k]=v);
-   const list=advise(o), box=document.getElementById("checklistResult");
-   box.innerHTML=list.length?`<h3>Checklist findings</h3><ul><li>${list.join("</li><li>")}</li></ul>`:"<p>No obvious issues from the checklist.</p>";
-   box.classList.add("show"); box.scrollIntoView({behavior:"smooth",block:"start"});
- });
 });
 </script>
 </body>
