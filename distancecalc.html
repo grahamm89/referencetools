@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Closest Customers Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button { font-size: 1em; margin: 5px 0; padding: 8px; width: 100%; }
+    .results { margin-top: 20px; }
+    .customer { border-bottom: 1px solid #ccc; padding: 10px 0; }
+  </style>
+</head>
+<body>
+  <h2>Find Closest Customers</h2>
+  <input type="text" id="postcode" placeholder="Enter your postcode">
+  <button onclick="findClosest()">Find Closest</button>
+  <div class="results" id="results"></div>
+
+  <script>
+    const customers = [
+      { name: "Bohunt Liphook", postcode: "GU30 7NY" },
+      { name: "The Petersfield School", postcode: "GU32 3LU" },
+      { name: "Sir William Perkins School", postcode: "KT16 9BN" },
+      { name: "Ewell Grove Primary", postcode: "KT17 1UZ" },
+      { name: "Stamford Green School", postcode: "KT19 8LU" },
+      { name: "Hampton Court School", postcode: "KT8 9BS" },
+      { name: "Asda 4792 Farnborough", postcode: "GU14 7LT" },
+      { name: "Zizzi Wokingham", postcode: "RG40 1AU" },
+      { name: "Cozino Lodge Camberley", postcode: "GU15 3NQ" },
+      { name: "Zizzi Bracknell", postcode: "RG12 1AG" },
+      // Add more from the image if needed
+    ];
+
+    async function geocode(postcode) {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`);
+      const data = await res.json();
+      if (data.length === 0) throw new Error("Postcode not found.");
+      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = deg => deg * Math.PI / 180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    async function findClosest() {
+      const input = document.getElementById("postcode").value.trim();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "Loading...";
+      try {
+        const [lat1, lon1] = await geocode(input);
+
+        const distances = await Promise.all(customers.map(async customer => {
+          try {
+            const [lat2, lon2] = await geocode(customer.postcode);
+            const distance = haversine(lat1, lon1, lat2, lon2);
+            return { ...customer, distance };
+          } catch {
+            return null;
+          }
+        }));
+
+        const sorted = distances.filter(Boolean).sort((a, b) => a.distance - b.distance).slice(0, 5);
+
+        resultsDiv.innerHTML = sorted.map(c =>
+          `<div class="customer">
+            <strong>${c.name}</strong><br>
+            ${c.postcode}<br>
+            Distance: ${c.distance.toFixed(2)} km
+          </div>`
+        ).join("");
+      } catch (err) {
+        resultsDiv.innerHTML = `<span style="color:red;">Error: ${err.message}</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
