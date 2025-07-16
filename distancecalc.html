@@ -5,7 +5,7 @@
   <title>Closest Customers Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
     input, button { font-size: 1em; margin: 5px 0; padding: 10px; width: 100%; }
     .results { margin-top: 20px; }
     .customer { border-bottom: 1px solid #ccc; padding: 10px 0; }
@@ -15,39 +15,23 @@
   <h2>Find Closest Customers</h2>
   <input type="text" id="postcode" placeholder="Enter your postcode">
   <button onclick="findClosest()">Find Closest</button>
-  <div class="results" id="results"></div>
+  <div class="progress" id="progress" style="margin-top:10px; color: #555;"></div><div class="results" id="results"></div>
 
   <script>
     const customers = [
-      { name: "The Costello School", postcode: "G21 4AL" },
-      { name: "PARLAUNT PARK SCHOOL", postcode: "SL3 8EQ" },
-      { name: "COSTAIN GROUP PLC", postcode: "S16 4UB" },
-      { name: "FARNBOROUGH WEST MEADE", postcode: "GU14 7LT" },
-      { name: "KINGSTON UPON THAMES", postcode: "KT2 6QL" },
-      { name: "BOHUNT LIPHOOK", postcode: "GU30 7NY" },
-      { name: "THE PETERSFIELD SCHOOL", postcode: "GU32 3LU" },
-      { name: "SIR WILLIAM PERKINS SCHOOL", postcode: "KT16 9BN" },
-      { name: "EWELL GROVE PRIMARY", postcode: "KT17 1UZ" },
-      { name: "EWELL CASTLE SCHOOL", postcode: "KT17 2AW" },
-      { name: "LITTLE DOWNSEND SCHOOL", postcode: "KT17 3AB" },
-      { name: "STAMFORD GREEN SCHOOL", postcode: "KT19 8LU" },
-      { name: "BLENHEIM HIGH SCHOOL", postcode: "KT19 9BH" },
-      { name: "COOMBE HILL JUNIOR", postcode: "KT2 7DD" },
-      { name: "ROKEBY SCHOOL", postcode: "KT2 7PB" },
-      { name: "ACSTI PRIMARY", postcode: "KT3 3JU" },
-      { name: "HAMPTON COURT HOUSE SCHOOL", postcode: "KT8 9BS" },
-      { name: "RUPERT HOUSE", postcode: "RG9 2BN" },
-      { name: "LANGLEY HALL PRIMARY ACADEMY", postcode: "SL3 8HT" },
-      { name: "NEWLANDS GIRLS SCHOOL", postcode: "SL6 4UB" },
-      { name: "Zizzi - Newbury", postcode: "RG14 5AA" },
-      { name: "Zizzi - Camberley", postcode: "GU15 3NQ" },
-      { name: "Zizzi - Basingstoke", postcode: "RG21 7BB" },
-      { name: "Zizzi - Wokingham", postcode: "RG40 1AU" },
-      { name: "Zizzi - Bracknell", postcode: "RG12 1AG" },
-      { name: "Zizzi - Windsor", postcode: "SL4 1PJ" },
-      { name: "Zizzi - Henley", postcode: "RG9 2AR" },
-      { name: "Zizzi - Marlow", postcode: "SL7 1BA" }
-    ];
+  { name: "The Costello School Crossborough Hil Basingstoke", postcode: "G21 4AL" },
+  { name: "PARLAUNT PARK SCHOOL Shefford Road clifton Slough", postcode: "SL3 8EQ" },
+  { name: "COSTAIN GROUP PLC Costain House Vanwell Bus Park Maidenhead", postcode: "S16 4UB" },
+  { name: "FARNBOROUGH WEST MEADE, WEST MEADE, FARNBOROUGH,", postcode: "GU14 7LT" },
+  { name: "KINGSTON UPON THAMES 142 LONDON ROAD, 142 LONDON ROAD, KINGSTON-UPON-THAME,", postcode: "KT2 6QL" },
+  { name: "4958 BASINGSTOKE BRIGHTON WAY, BRIGHTON WAY, BASINGSTOKE, RG22 44S", postcode: "G22 4HS" },
+  { name: "4154 SLOUGH TELFORO ORIVE, TELFORO ORIVE, SLOUGH,", postcode: "SL1 9LA" },
+  { name: "zie 20 The Riverside, The Oracle Shopping Centre, Reading", postcode: "RG1 2AG" },
+  { name: "diel 1 London Street Basingstoke", postcode: "G21 7NT" },
+  { name: "Anzu Group 780 1769667 Zier 11-13 Broad Street Wokingham", postcode: "G40 1AU" },
+  { name: "int The Former White Hart Henley On Thames", postcode: "G9 2AR" },
+  { name: "Corrina Lodge Care Home 79 The Avenue, Camberley, Surrey,", postcode: "GU15 3NQ" }
+];
 
     async function geocode(postcode) {
       const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(postcode)}`);
@@ -65,6 +49,17 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
+    async function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function getTravelTime(start, end) {
+      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=false`);
+      const data = await res.json();
+      if (data.code !== "Ok") throw new Error("Routing failed");
+      return data.routes[0].duration / 60; // minutes
+    }
+
     async function findClosest() {
       const input = document.getElementById("postcode").value.trim();
       const resultsDiv = document.getElementById("results");
@@ -72,7 +67,20 @@
       try {
         const [lat1, lon1] = await geocode(input);
 
-        const distances = await Promise.all(customers.map(async customer => {
+        const results = [];
+    for (let i = 0; i < customers.length; i++) {
+      document.getElementById("progress").innerText = `Processing ${i + 1} of ${customers.length}...`;
+      const customer = customers[i];
+      try {
+        const customerCoords = await geocode(customer.postcode);
+        const driveTime = await getTravelTime([lat1, lon1], customerCoords);
+        results.push({ ...customer, driveTime });
+      } catch (e) {
+        console.warn(`Failed for ${customer.name}:`, e);
+      }
+      if (i < customers.length - 1) await sleep(1100);
+    }
+    const distances = results;
           try {
             const [lat2, lon2] = await geocode(customer.postcode);
             const distance = haversine(lat1, lon1, lat2, lon2);
@@ -84,11 +92,12 @@
 
         const sorted = distances.filter(Boolean).sort((a, b) => a.distance - b.distance).slice(0, 5);
 
-        resultsDiv.innerHTML = sorted.map(c =>
+        document.getElementById("progress").innerText = "";
+      resultsDiv.innerHTML = sorted.map(c =>
           `<div class="customer">
             <strong>${c.name}</strong><br>
             Postcode: ${c.postcode}<br>
-            Distance: ${c.distance.toFixed(2)} km
+            Drive Time: ${c.driveTime.toFixed(1)} minutes
           </div>`
         ).join("");
       } catch (err) {
