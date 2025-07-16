@@ -5,8 +5,8 @@
   <title>Closest Customers Finder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { font-size: 1em; margin: 5px 0; padding: 8px; width: 100%; }
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    input, button { font-size: 1em; margin: 5px 0; padding: 10px; width: 100%; }
     .results { margin-top: 20px; }
     .customer { border-bottom: 1px solid #ccc; padding: 10px 0; }
   </style>
@@ -19,21 +19,38 @@
 
   <script>
     const customers = [
-      { name: "Bohunt Liphook", postcode: "GU30 7NY" },
-      { name: "The Petersfield School", postcode: "GU32 3LU" },
-      { name: "Sir William Perkins School", postcode: "KT16 9BN" },
-      { name: "Ewell Grove Primary", postcode: "KT17 1UZ" },
-      { name: "Stamford Green School", postcode: "KT19 8LU" },
-      { name: "Hampton Court School", postcode: "KT8 9BS" },
-      { name: "Asda 4792 Farnborough", postcode: "GU14 7LT" },
-      { name: "Zizzi Wokingham", postcode: "RG40 1AU" },
-      { name: "Cozino Lodge Camberley", postcode: "GU15 3NQ" },
-      { name: "Zizzi Bracknell", postcode: "RG12 1AG" },
-      // Add more from the image if needed
+      { name: "The Costello School", postcode: "G21 4AL" },
+      { name: "PARLAUNT PARK SCHOOL", postcode: "SL3 8EQ" },
+      { name: "COSTAIN GROUP PLC", postcode: "S16 4UB" },
+      { name: "FARNBOROUGH WEST MEADE", postcode: "GU14 7LT" },
+      { name: "KINGSTON UPON THAMES", postcode: "KT2 6QL" },
+      { name: "BOHUNT LIPHOOK", postcode: "GU30 7NY" },
+      { name: "THE PETERSFIELD SCHOOL", postcode: "GU32 3LU" },
+      { name: "SIR WILLIAM PERKINS SCHOOL", postcode: "KT16 9BN" },
+      { name: "EWELL GROVE PRIMARY", postcode: "KT17 1UZ" },
+      { name: "EWELL CASTLE SCHOOL", postcode: "KT17 2AW" },
+      { name: "LITTLE DOWNSEND SCHOOL", postcode: "KT17 3AB" },
+      { name: "STAMFORD GREEN SCHOOL", postcode: "KT19 8LU" },
+      { name: "BLENHEIM HIGH SCHOOL", postcode: "KT19 9BH" },
+      { name: "COOMBE HILL JUNIOR", postcode: "KT2 7DD" },
+      { name: "ROKEBY SCHOOL", postcode: "KT2 7PB" },
+      { name: "ACSTI PRIMARY", postcode: "KT3 3JU" },
+      { name: "HAMPTON COURT HOUSE SCHOOL", postcode: "KT8 9BS" },
+      { name: "RUPERT HOUSE", postcode: "RG9 2BN" },
+      { name: "LANGLEY HALL PRIMARY ACADEMY", postcode: "SL3 8HT" },
+      { name: "NEWLANDS GIRLS SCHOOL", postcode: "SL6 4UB" },
+      { name: "Zizzi - Newbury", postcode: "RG14 5AA" },
+      { name: "Zizzi - Camberley", postcode: "GU15 3NQ" },
+      { name: "Zizzi - Basingstoke", postcode: "RG21 7BB" },
+      { name: "Zizzi - Wokingham", postcode: "RG40 1AU" },
+      { name: "Zizzi - Bracknell", postcode: "RG12 1AG" },
+      { name: "Zizzi - Windsor", postcode: "SL4 1PJ" },
+      { name: "Zizzi - Henley", postcode: "RG9 2AR" },
+      { name: "Zizzi - Marlow", postcode: "SL7 1BA" }
     ];
 
     async function geocode(postcode) {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(postcode)}`);
       const data = await res.json();
       if (data.length === 0) throw new Error("Postcode not found.");
       return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
@@ -70,7 +87,7 @@
         resultsDiv.innerHTML = sorted.map(c =>
           `<div class="customer">
             <strong>${c.name}</strong><br>
-            ${c.postcode}<br>
+            Postcode: ${c.postcode}<br>
             Distance: ${c.distance.toFixed(2)} km
           </div>`
         ).join("");
