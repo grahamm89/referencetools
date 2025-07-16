@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Closest Customers by Drive Time</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
-    input, button { font-size: 1em; margin: 5px 0; padding: 10px; width: 100%; }
-    .results { margin-top: 20px; }
-    .customer { border-bottom: 1px solid #ccc; padding: 10px 0; }
-    .progress { margin-top: 10px; color: #555; }
-  </style>
+<meta charset="UTF-8">
+<title>Closest Customers – Fast Mode</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font-family:Arial,Helvetica,sans-serif;max-width:700px;margin:auto;padding:20px}
+ input,button{font-size:1em;width:100%;padding:10px;margin:6px 0}
+ .progress{margin:10px 0;color:#555}
+ .customer{border-bottom:1px solid #ccc;padding:10px 0}
+</style>
 </head>
 <body>
-  <h2>Find Closest Customers (by drive time)</h2>
-  <input type="text" id="postcode" placeholder="Enter your postcode">
-  <button onclick="findClosest()">Find Closest</button>
-  <div class="progress" id="progress"></div>
-  <div class="results" id="results"></div>
+<h2>Find Closest Customers (drive time)</h2>
+<input id="postcode" placeholder="Enter postcode">
+<button onclick="run()">Find closest</button>
+<div id="progress" class="progress"></div>
+<div id="results"></div>
 
-  <script>
-    /* === cleaned dataset: 436 customers === */
+<script>
+/* ------------- raw dataset (postcode + display name) ------------- */
+/*  ⚠  KEEP this short list as-is; add/remove rows if needed.        */
+/*  Lat/lon will be added automatically the first time the page runs */
 const customers = [
   { name: "Bohunt Liphook Longmoor Road", postcode: "GU30 7NY" },
   { name: "The Petersfield School Cranford Road", postcode: "GU32 3LU" },
@@ -459,61 +460,76 @@ const customers = [
   { name: "Charrington Manor Care Home. 1A Hobbs Close, West Byfleet, Surrey, KT14 6LT  ", postcode: "KT14 6LT" },
   { name: "Hamberley Neurocare Basingstoke. Bradley Wy, Basingstoke RG23 7GF  ", postcode: "RG23 7GF" }
 ];
-    /* ---------- helper utilities ---------- */
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
+/* ------------- utility helpers ------------- */
+const sleep   = ms => new Promise(r=>setTimeout(r,ms));
+const bar     = id => document.getElementById(id);
+const API_PC  = pc => `https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`;
+const API_OSRM= (a,b)=>`https://router.project-osrm.org/route/v1/driving/${a[1]},${a[0]};${b[1]},${b[0]}?overview=false`;
 
-    async function geocode(pc) {
-      const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
-      const j = await r.json();
-      if (j.status !== 200) throw new Error("Geocode failed for " + pc);
-      return [j.result.latitude, j.result.longitude];
+async function getLatLon(pc){
+  const r=await fetch(API_PC(pc)); const j=await r.json();
+  if(j.status!==200) throw pc; return [j.result.latitude,j.result.longitude];
+}
+async function driveMins(a,b){
+  const r=await fetch(API_OSRM(a,b)); const j=await r.json();
+  if(j.code!=="Ok") throw "route"; return j.routes[0].duration/60;
+}
+
+/* ------------- first-run geocode & cache ------------- */
+async function loadCustomers(){
+  // check cache
+  const cached=localStorage.getItem("custCoords_v1");
+  if(cached){ return JSON.parse(cached); }
+
+  // otherwise geocode once
+  const list=[];
+  for(let i=0;i<baseCustomers.length;i++){
+    bar("progress").textContent=`Geocoding ${i+1}/${baseCustomers.length}`;
+    const c=baseCustomers[i];
+    try{ 
+      const [lat,lon]=await getLatLon(c.pc);
+      list.push({...c,lat,lon});
+    }catch{ /* skip bad pc */ }
+    if(i<baseCustomers.length-1) await sleep(1300); // polite throttle
+  }
+  localStorage.setItem("custCoords_v1",JSON.stringify(list));
+  bar("progress").textContent="";
+  return list;
+}
+
+/* ------------- main workflow ------------- */
+async function run(){
+  const userPC=bar("postcode").value.trim().toUpperCase();
+  if(!userPC) return alert("Enter a postcode");
+  bar("progress").textContent="Geocoding your postcode…";
+  bar("results").innerHTML="";
+  try{
+    const userLL = await getLatLon(userPC);
+    const cust   = await loadCustomers();
+    const rows   = [];
+
+    for(let i=0;i<cust.length;i++){
+      bar("progress").textContent=`Routing ${i+1}/${cust.length}`;
+      try{
+        const mins=await driveMins(userLL,[cust[i].lat,cust[i].lon]);
+        rows.push({...cust[i],mins});
+      }catch{}
+      if(i<cust.length-1) await sleep(1100);
     }
 
-    async function driveMinutes(start, end) {
-      const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=false`;
-      const r = await fetch(url);
-      const j = await r.json();
-      if (j.code !== "Ok") throw new Error("Routing failed");
-      return j.routes[0].duration / 60;   // seconds → minutes
-    }
-
-    /* ---------- main workflow ---------- */
-    async function findClosest() {
-      const pc = document.getElementById("postcode").value.trim().toUpperCase();
-      const out = document.getElementById("results");
-      const bar = document.getElementById("progress");
-
-      if (!pc) { alert("Please enter a postcode"); return; }
-
-      out.innerHTML = "";  bar.textContent = "Geocoding your postcode…";
-      try {
-        const user = await geocode(pc);
-        const rows = [];
-
-        for (let i = 0; i < customers.length; i++) {
-          const c = customers[i];
-          bar.textContent = `Processing ${i + 1} / ${customers.length}`;
-          try {
-            const coord = await geocode(c.postcode);
-            const mins  = await driveMinutes(user, coord);
-            rows.push({ ...c, mins });
-          } catch { /* skip bad rows */ }
-          if (i < customers.length - 1) await sleep(1100);  // throttle
-        }
-
-        bar.textContent = "";
-        rows.sort((a, b) => a.mins - b.mins);
-        out.innerHTML = rows.slice(0, 5).map(c => `
-          <div class="customer">
-            <strong>${c.name}</strong><br>
-            ${c.postcode}<br>
-            Drive time: ${c.mins.toFixed(1)} min
-          </div>`).join("");
-      } catch (e) {
-        bar.textContent = "";
-        out.innerHTML = `<span style="color:red;">${e.message}</span>`;
-      }
-    }
-  </script>
+    bar("progress").textContent="";
+    rows.sort((a,b)=>a.mins-b.mins);
+    bar("results").innerHTML = rows.slice(0,5).map(c=>`
+      <div class="customer">
+        <strong>${c.name}</strong><br>
+        ${c.pc}<br>
+        Drive time: ${c.mins.toFixed(1)} min
+      </div>`).join("");
+  }catch(e){
+    bar("progress").textContent="";
+    bar("results").innerHTML=`<span style="color:red">Error: ${e}</span>`;
+  }
+}
+</script>
 </body>
 </html>
