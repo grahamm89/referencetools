@@ -14,7 +14,7 @@
 <body>
 <div class="container my-3">
 
-  <h1 class="h3 text-center mb-4">Site Chemical &amp; Equipment Inspection</h1>
+  <h1 class="h3 text-center mb-4">Barchester Checklist</h1>
 
   <!-- ───── Tabs header ───── -->
   <ul class="nav nav-tabs" role="tablist">
@@ -37,12 +37,12 @@
       </ul>
     </div>
 
-    <!-- Dishwasher instructions WITH LINK -->
+    <!-- Dishwasher instructions (with titration link) -->
     <div class="tab-pane fade" id="dish" role="tabpanel">
       <h2 class="h5 mt-3">Dishwasher Titration Testing &amp; Water Hardness Test – Instructions</h2>
       <ul>
         <li>
-          Conduct titration tests on all dishwashers during the visit 
+          Conduct titration tests on all dishwashers during the visit
           (<a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">Titration&nbsp;Testing&nbsp;Tool</a>).
         </li>
         <li>Ensure results are documented and submitted.</li>
@@ -163,19 +163,18 @@ function renderStock(){
   tb.innerHTML='';
   stockLines.forEach(line=>{
     const [sku,...descArr]=line.split(',');
-    const desc=descArr.join(',').trim();
     tb.insertAdjacentHTML('beforeend',`
       <tr>
         <td>${sku.trim()}</td>
-        <td>${desc}</td>
+        <td>${descArr.join(',').trim()}</td>
         <td><input class="form-control form-control-sm text-end" type="number" min="0"></td>
       </tr>`);
   });
 }
 
-/* === Helpers === */
+/* === Stock helpers === */
 const filledRows=()=>[...document.querySelectorAll('#stockTable tbody tr')]
-  .filter(r=>r.querySelector('input').value.trim()!=='');
+  .filter(r=>r.querySelector('input').value.trim()!=='')
 function copyStock(){
   navigator.clipboard.writeText(
     [...document.querySelectorAll('#stockTable tbody tr')]
@@ -184,13 +183,9 @@ function copyStock(){
   ).then(()=>alert('Stock list copied.'));
 }
 function downloadCSV(){
-  const rows=[...document.querySelectorAll('#stockTable tbody tr')];
-  const csv=rows.map(r=>{
-    const sku=r.cells[0].textContent;
-    const desc=r.cells[1].textContent.replace(/"/g,'""');
-    const qty=r.querySelector('input').value||'';
-    return `"${sku}","${desc}","${qty}"`;
-  }).join('\n');
+  const csv=[...document.querySelectorAll('#stockTable tbody tr')]
+    .map(r=>`"${r.cells[0].textContent}","${r.cells[1].textContent.replace(/"/g,'""')}","${r.querySelector('input').value||''}"`)
+    .join('\n');
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
   a.download='stock_check.csv';
@@ -198,19 +193,14 @@ function downloadCSV(){
 }
 function emailStock(){
   const rows=filledRows();
-  if(rows.length===0){alert('Enter at least one quantity before emailing.');return;}
-  const body=rows.map(r=>{
-    const sku=r.cells[0].textContent;
-    const desc=r.cells[1].textContent;
-    const qty=r.querySelector('input').value.trim();
-    return `${sku} - ${desc} - Qty: ${qty}`;
-  }).join('\r\n');
+  if(!rows.length){alert('Enter at least one quantity before emailing.');return;}
+  const body=rows.map(r=>`${r.cells[0].textContent} - ${r.cells[1].textContent} - Qty: ${r.querySelector('input').value.trim()}`).join('\r\n');
   location.href='mailto:sarah.blair@solenis.com,BKappes@solenis.com'
-    + '?subject='+encodeURIComponent('Storeroom Stock Check')
-    + '&body='+encodeURIComponent(body);
+    +'?subject='+encodeURIComponent('Storeroom Stock Check')
+    +'&body='+encodeURIComponent(body);
 }
 
-/* === Init === */
+/* Init */
 renderStock();
 </script>
 </body>
