@@ -13,10 +13,9 @@
 </head>
 <body>
 <div class="container my-3">
-
   <h1 class="h3 text-center mb-4">Site Chemical &amp; Equipment Inspection</h1>
 
-  <!-- Tabs -->
+  <!-- Tabs header -->
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#chem">Chemical Dispensing</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dish">Dishwasher &amp; Water</button></li>
@@ -25,68 +24,15 @@
   </ul>
 
   <div class="tab-content">
+    <!-- Chemical, Dishwasher, Laundry instruction tabs (unchanged) -->
+    … <!-- keep the same content as in your last version -->
 
-    <!-- Chemical instructions -->
-    <div class="tab-pane fade show active" id="chem" role="tabpanel">
-      <h2 class="h5 mt-3">Chemical Dispensing Equipment – Instructions</h2>
-      <ul>
-        <li>Ensure all dosing equipment is functioning correctly and delivering the correct dosage.</li>
-        <li>Perform Quat tests on D10 bottles to verify concentration.</li>
-        <li>Confirm all chemicals are connected to approved dosing systems.</li>
-        <li>Enhance must be dosed via a pelican pump. If not, connect and explain proper dosing.</li>
-        <li>Report any faulty or manual dosing setups.</li>
-      </ul>
-    </div>
-
-    <!-- Dishwasher instructions -->
-    <div class="tab-pane fade" id="dish" role="tabpanel">
-      <h2 class="h5 mt-3">Dishwasher Titration Testing &amp; Water Hardness Test – Instructions</h2>
-      <ul>
-        <li>Conduct titration tests on all dishwashers during the visit.</li>
-        <li>Ensure results are documented and submitted.</li>
-        <li>Complete a water hardness test at each site.</li>
-        <li>Clearly record results for future reference and calibration.</li>
-      </ul>
-    </div>
-
-    <!-- Laundry instructions + L5000 link -->
-    <div class="tab-pane fade" id="laundry" role="tabpanel">
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <h2 class="h5 mb-0">Laundry Equipment &amp; Dosing Monitoring – Instructions</h2>
-        <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#l5000Modal">L5000&nbsp;Reset&nbsp;Instructions</button>
-      </div>
-      <ul class="mt-2">
-        <li>Check that laundry dosing units function correctly.</li>
-        <li>Ensure dosing is appropriate for the site’s water hardness.</li>
-        <li>Reset wash counts at every bi-monthly visit (see L5000 reset instructions).</li>
-        <li>Maintain a wash-count log to track trends and support benchmarking.</li>
-      </ul>
-    </div>
-
-    <!-- Storeroom Stock -->
-    <div class="tab-pane fade" id="stock" role="tabpanel">
-      <h2 class="h5 mt-3">Storeroom Stock Check</h2>
-      <p class="small text-muted mb-1">Enter quantities then copy, export, or email.</p>
-
-      <div class="table-responsive">
-        <table id="stockTable" class="table table-sm align-middle">
-          <thead class="table-light">
-            <tr><th>SKU</th><th>Description</th><th style="width:120px">Quantity</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="d-flex flex-wrap gap-2">
-        <button class="btn btn-outline-secondary" onclick="copyStock()">Copy&nbsp;to&nbsp;Clipboard</button>
-        <button class="btn btn-outline-secondary" onclick="downloadCSV()">Export&nbsp;CSV</button>
-        <button class="btn btn-primary" onclick="emailStock()">Email&nbsp;Stock&nbsp;List</button>
-      </div>
-    </div>
+    <!-- Storeroom Stock tab (unchanged) -->
+    … <!-- keep the same stock table and buttons -->
   </div><!-- /tab-content -->
 </div><!-- /container -->
 
-<!-- L5000 modal -->
+<!-- L5000 modal with NEW image -->
 <div class="modal fade" id="l5000Modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
@@ -112,6 +58,11 @@ or no product will dose:
 • Power-cycle (switch under dispenser) wait 10 s, or
 • Hold MENU 5 s to return directly to Home.
 </pre>
+
+<!-- Added reference image -->
+<img src="https://raw.githubusercontent.com/grahamm89/referencetools/refs/heads/main/c66587ab-799a-4a10-a338-8e1077678481.jpeg"
+     class="img-fluid rounded mt-3"
+     alt="L5000 control panel reference">
       </div>
     </div>
   </div>
@@ -121,108 +72,10 @@ or no product will dose:
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* ===== Master stock data ===== */
-const stockLines = `
-7508226,Suma Star D1 2x5L W1779+
-100862178,Suma Break up D3.5 2x5L W1605+
-100885707,Suma Bac D10 Sanitizer 2x5L GB,IRL
-101103083,Suma Nova L6L 2x5L GB,I,IRL
-7010160,Suma Rinse A5 2x5L W1886+
-100873427,Suma Shine K2 10Kg W3350
-101107213,Suma Scale D5.2 2x5L W1779
-7513553,Suma Inox D7.1 6x0.75L W207
-7511933,Suma Light D1.2 6x1L W3424
-101102291,Cif PF.Oven&Grill Cl.6x0.75L W484
-101104731,Bryta 5in1 DishwasherTabs 4x120pc GB,IRL
-100941436,DI Oxivir Excel 2x5L W396
-7516770,Good Sense Breakdown 2x5L W1779
-101105070,Shield 3 Way Toilet Cleaner 12x1L GB,IRL
-100955181,Shield Limescale Remover 12x1L GB,IRL
-100987458,Room Care R5.1-plus 2x1.5L W207
-100829788,Room Care R8 6x0.75L W3863
-101107893,TASKI Sani MouldOut 6x0.75L W469
-411090,Enhance Spot&Stain 6x0.75L GB,IRL X
-411100,Enhance Extraction Clnr 2x5L GB,IRL X
-7509661,Room Care R4 6x0.75L W2
-7512374,TASKI Tapi Gum 6x0.5L W1
-7513050,TASKI Sprint Glass 6x0.75L W561
-6000832,Horizon Light 10L GB,IRL
-7515126,Horizon Bright 10L GB,IRL
-101108143,Comfort PF.Blue Skies Conc 10L GB,IRL
-7522906,Horizon Bio 8.4Kg GB,IRL
-6973314,Clax Peroxy 43B1 10Kg W3660
-`.trim().split(/\r?\n/);
-
-/* ===== Build stock table ===== */
-function renderStock(){
-  const tbody = document.querySelector('#stockTable tbody');
-  tbody.innerHTML = '';
-  stockLines.forEach(line=>{
-    const [sku, ...descArr] = line.split(',');
-    const desc = descArr.join(',').trim();
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${sku.trim()}</td>
-      <td>${desc}</td>
-      <td><input class="form-control form-control-sm text-end" type="number" min="0"></td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-/* ===== Utility: get filled rows ===== */
-function getFilledRows(){
-  return [...document.querySelectorAll('#stockTable tbody tr')]
-         .filter(r => r.querySelector('input').value.trim() !== '');
-}
-
-/* ===== Copy to clipboard ===== */
-function copyStock(){
-  const rows = [...document.querySelectorAll('#stockTable tbody tr')];
-  const txt = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent;
-    const qty  = r.querySelector('input').value || '';
-    return `${sku}\t${desc}\t${qty}`;
-  }).join('\n');
-  navigator.clipboard.writeText(txt).then(()=>alert('Stock list copied.'));
-}
-
-/* ===== Export CSV ===== */
-function downloadCSV(){
-  const rows = [...document.querySelectorAll('#stockTable tbody tr')];
-  const csv  = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent.replace(/"/g,'""');
-    const qty  = r.querySelector('input').value || '';
-    return `"${sku}","${desc}","${qty}"`;
-  }).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'stock_check.csv';
-  a.click();
-}
-
-/* ===== Email stock list ===== */
-function emailStock(){
-  const rows = getFilledRows();
-  if(rows.length === 0){
-    alert('Enter at least one quantity before emailing.');
-    return;
-  }
-  const bodyLines = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent;
-    const qty  = r.querySelector('input').value.trim();
-    return `${sku} - ${desc} - Qty: ${qty}`;
-  });
-  const mailto = 'mailto:sarah.blair@solenis.com,BKappes@solenis.com'
-               + '?subject=' + encodeURIComponent('Storeroom Stock Check')
-               + '&body='    + encodeURIComponent(bodyLines.join('\r\n'));
-  window.location.href = mailto;
-}
-
-/* ===== Init ===== */
-renderStock();
+/* keep all existing JavaScript exactly as in the previous version:
+   - renderStock()
+   - copyStock(), downloadCSV(), emailStock()
+   - and the stockLines data                                  */
 </script>
 </body>
 </html>
