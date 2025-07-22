@@ -6,17 +6,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-  body            { padding-bottom:4rem; }
-  .tab-content    { margin-top:1.5rem; }
-  .qa-text        { font-family:monospace; white-space:pre-wrap; }
+  body         { padding-bottom:4rem; }
+  .tab-content { margin-top:1.5rem; }
+  .qa-text     { font-family:monospace; white-space:pre-wrap; }
 </style>
 </head>
 <body>
 <div class="container my-3">
 
-  <h1 class="h3 text-center mb-4">Site Chemical & Equipment Inspection</h1>
+  <h1 class="h3 text-center mb-4">Site Chemical &amp; Equipment Inspection</h1>
 
-  <!-- ───────── Tabs header ───────── -->
+  <!-- ───── Tabs header ───── -->
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#chem">Chemical Dispensing</button></li>
     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dish">Dishwasher&nbsp;&amp;&nbsp;Water</button></li>
@@ -25,7 +25,7 @@
   </ul>
 
   <div class="tab-content">
-    <!-- ───────── Chemical instructions ───────── -->
+    <!-- Chemical instructions -->
     <div class="tab-pane fade show active" id="chem" role="tabpanel">
       <h2 class="h5 mt-3">Chemical Dispensing Equipment – Instructions</h2>
       <ul>
@@ -37,21 +37,24 @@
       </ul>
     </div>
 
-    <!-- ───────── Dishwasher instructions ───────── -->
+    <!-- Dishwasher instructions WITH LINK -->
     <div class="tab-pane fade" id="dish" role="tabpanel">
-      <h2 class="h5 mt-3">Dishwasher Titration Testing & Water Hardness Test – Instructions</h2>
+      <h2 class="h5 mt-3">Dishwasher Titration Testing &amp; Water Hardness Test – Instructions</h2>
       <ul>
-        <li>Conduct titration tests on all dishwashers during the visit.</li>
+        <li>
+          Conduct titration tests on all dishwashers during the visit 
+          (<a href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">Titration&nbsp;Testing&nbsp;Tool</a>).
+        </li>
         <li>Ensure results are documented and submitted.</li>
         <li>Complete a water hardness test at each site.</li>
         <li>Clearly record results for future reference and calibration.</li>
       </ul>
     </div>
 
-    <!-- ───────── Laundry instructions ───────── -->
+    <!-- Laundry instructions -->
     <div class="tab-pane fade" id="laundry" role="tabpanel">
       <div class="d-flex justify-content-between align-items-center mt-3">
-        <h2 class="h5 mb-0">Laundry Equipment & Dosing Monitoring – Instructions</h2>
+        <h2 class="h5 mb-0">Laundry Equipment &amp; Dosing Monitoring – Instructions</h2>
         <button class="btn btn-sm btn-link" data-bs-toggle="modal" data-bs-target="#l5000Modal">L5000 Reset Instructions</button>
       </div>
       <ul class="mt-2">
@@ -62,7 +65,7 @@
       </ul>
     </div>
 
-    <!-- ───────── Storeroom Stock tab ───────── -->
+    <!-- Storeroom Stock tab -->
     <div class="tab-pane fade" id="stock" role="tabpanel">
       <h2 class="h5 mt-3">Storeroom Stock Check</h2>
       <p class="small text-muted mb-1">Enter quantities, then copy, export, or email.</p>
@@ -85,7 +88,7 @@
   </div><!-- /tab-content -->
 </div><!-- /container -->
 
-<!-- ───────── L5000 modal ───────── -->
+<!-- L5000 modal -->
 <div class="modal fade" id="l5000Modal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
@@ -124,9 +127,8 @@ or no product will dose:
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* ===== Master stock list ===== */
-const stockLines = `
-7508226,Suma Star D1 2x5L W1779+
+/* === Stock data === */
+const stockLines=`7508226,Suma Star D1 2x5L W1779+
 100862178,Suma Break up D3.5 2x5L W1605+
 100885707,Suma Bac D10 Sanitizer 2x5L GB,IRL
 101103083,Suma Nova L6L 2x5L GB,I,IRL
@@ -153,77 +155,62 @@ const stockLines = `
 7515126,Horizon Bright 10L GB,IRL
 101108143,Comfort PF.Blue Skies Conc 10L GB,IRL
 7522906,Horizon Bio 8.4Kg GB,IRL
-6973314,Clax Peroxy 43B1 10Kg W3660
-`.trim().split(/\r?\n/);
+6973314,Clax Peroxy 43B1 10Kg W3660`.split(/[\r\n]+/);
 
-/* ===== Build stock table ===== */
+/* === Build stock table === */
 function renderStock(){
-  const tbody = document.querySelector('#stockTable tbody');
-  tbody.innerHTML = '';
+  const tb=document.querySelector('#stockTable tbody');
+  tb.innerHTML='';
   stockLines.forEach(line=>{
-    const [sku , ...descArr] = line.split(',');
-    const desc = descArr.join(',').trim();
-    const tr   = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${sku.trim()}</td>
-      <td>${desc}</td>
-      <td><input class="form-control form-control-sm text-end" type="number" min="0"></td>`;
-    tbody.appendChild(tr);
+    const [sku,...descArr]=line.split(',');
+    const desc=descArr.join(',').trim();
+    tb.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td>${sku.trim()}</td>
+        <td>${desc}</td>
+        <td><input class="form-control form-control-sm text-end" type="number" min="0"></td>
+      </tr>`);
   });
 }
 
-/* ===== Helpers for filled rows ===== */
-const getFilledRows = () =>
-  [...document.querySelectorAll('#stockTable tbody tr')]
-  .filter(r => r.querySelector('input').value.trim() !== '');
-
-/* ===== Copy to clipboard ===== */
+/* === Helpers === */
+const filledRows=()=>[...document.querySelectorAll('#stockTable tbody tr')]
+  .filter(r=>r.querySelector('input').value.trim()!=='');
 function copyStock(){
-  const rows = [...document.querySelectorAll('#stockTable tbody tr')];
-  const txt  = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent;
-    const qty  = r.querySelector('input').value || '';
-    return `${sku}\t${desc}\t${qty}`;
-  }).join('\n');
-  navigator.clipboard.writeText(txt).then(()=>alert('Stock list copied.'));
+  navigator.clipboard.writeText(
+    [...document.querySelectorAll('#stockTable tbody tr')]
+    .map(r=>`${r.cells[0].textContent}\t${r.cells[1].textContent}\t${r.querySelector('input').value||''}`)
+    .join('\n')
+  ).then(()=>alert('Stock list copied.'));
 }
-
-/* ===== Export CSV ===== */
 function downloadCSV(){
-  const rows = [...document.querySelectorAll('#stockTable tbody tr')];
-  const csv  = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent.replace(/"/g,'""');
-    const qty  = r.querySelector('input').value || '';
+  const rows=[...document.querySelectorAll('#stockTable tbody tr')];
+  const csv=rows.map(r=>{
+    const sku=r.cells[0].textContent;
+    const desc=r.cells[1].textContent.replace(/"/g,'""');
+    const qty=r.querySelector('input').value||'';
     return `"${sku}","${desc}","${qty}"`;
   }).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'stock_check.csv';
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='stock_check.csv';
   a.click();
 }
-
-/* ===== Email stock list ===== */
 function emailStock(){
-  const rows = getFilledRows();
-  if(rows.length === 0){
-    alert('Enter at least one quantity before emailing.');
-    return;
-  }
-  const bodyLines = rows.map(r=>{
-    const sku  = r.cells[0].textContent;
-    const desc = r.cells[1].textContent;
-    const qty  = r.querySelector('input').value.trim();
+  const rows=filledRows();
+  if(rows.length===0){alert('Enter at least one quantity before emailing.');return;}
+  const body=rows.map(r=>{
+    const sku=r.cells[0].textContent;
+    const desc=r.cells[1].textContent;
+    const qty=r.querySelector('input').value.trim();
     return `${sku} - ${desc} - Qty: ${qty}`;
-  });
-  const mailto = 'mailto:sarah.blair@solenis.com,BKappes@solenis.com'
-               + '?subject=' + encodeURIComponent('Storeroom Stock Check')
-               + '&body='    + encodeURIComponent(bodyLines.join('\r\n'));
-  window.location.href = mailto;
+  }).join('\r\n');
+  location.href='mailto:sarah.blair@solenis.com,BKappes@solenis.com'
+    + '?subject='+encodeURIComponent('Storeroom Stock Check')
+    + '&body='+encodeURIComponent(body);
 }
 
-/* ===== Init ===== */
+/* === Init === */
 renderStock();
 </script>
 </body>
