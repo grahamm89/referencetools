@@ -5,65 +5,93 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dishwasher Troubleshooting Helper</title>
 
+<!-- ────────── COLOURS & RESET ────────── -->
 <style>
 :root{
-  --bg:#f7f9fa;--card:#fff;--txt:#222;--accent:#0073e6;--sep:rgba(0,0,0,.08);
-  --yes:#2e8b57;--no:#c0392b
+  --bg:#f7f9fa;        --card:#ffffff; --txt:#222;
+  --accent:#0073e6;    --sep:rgba(0,0,0,.08);
+  --yes:#2e8b57;       --no:#c0392b;
+  --danger:#e74c3c;    --success:#2ecc71;
 }
 @media (prefers-color-scheme:dark){
-  :root{--bg:#121417;--card:#1e2125;--txt:#e0e3e6;--accent:#53a2ff;
-        --sep:rgba(255,255,255,.08);--yes:#2ecc71;--no:#e74c3c}
+  :root{
+    --bg:#121417;      --card:#1e2125; --txt:#e0e3e6;
+    --accent:#53a2ff;  --sep:rgba(255,255,255,.08);
+    --yes:#2ecc71;     --no:#e74c3c;
+  }
 }
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-     background:var(--bg);color:var(--txt);padding:1rem;line-height:1.45}
-h1{margin:.2rem 0 .5rem}
-section{background:var(--card);padding:1rem 1.1rem;border-radius:8px;
-        box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--txt);line-height:1.45;padding:1rem;
+}
+h1{margin:.2rem 0 .6rem}
+h2{margin-bottom:.5rem}
+section{
+  background:var(--card);padding:1rem 1.1rem;border-radius:8px;
+  box-shadow:0 2px 4px rgba(0,0,0,.05);margin-bottom:1.6rem
+}
 label{font-weight:600}
 a.inline{color:var(--accent);text-decoration:none;font-weight:600}
 a.inline:hover{text-decoration:underline}
-select,button{font-size:1rem;padding:.55rem .7rem;margin-top:.35rem;border-radius:6px}
-select{width:100%}
-button{cursor:pointer;background:var(--accent);border:1px solid var(--accent);color:#fff;transition:opacity .18s}
+select,button,input{
+  font-size:1rem;padding:.55rem .7rem;border-radius:6px;border:1px solid var(--sep)
+}
+select,input{width:100%}
+button{
+  cursor:pointer;background:var(--accent);border-color:var(--accent);color:#fff;
+  transition:opacity .18s;width:100%
+}
 button:hover{opacity:.9}
-.result{display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem}
-.result.show{display:block}
+.result{
+  display:none;margin-top:1rem;border-left:4px solid var(--accent);padding-left:1rem
+}
+.result.show{display:block;animation:fade .35s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
 
-/* Essential Tests bar */
+/* Essential bar */
 #essBar{margin-bottom:1.2rem;font-size:.95rem}
 #essBar a{margin-right:1.2rem}
 
-/* Essential-Check cards */
-.qcard{border:1px solid var(--sep);border-radius:6px;padding:.8rem .9rem;
-       margin-bottom:.9rem;display:flex;flex-wrap:wrap;align-items:center}
+/* Toggle cards */
+.qcard{
+  border:1px solid var(--sep);border-radius:6px;padding:.8rem .9rem;
+  margin-bottom:.9rem;display:flex;flex-wrap:wrap;align-items:center
+}
 .qcard p{flex:1 1 260px;margin:.25rem 0;font-weight:500}
 .toggle{display:inline-flex;border-radius:20px;overflow:hidden;margin-left:auto}
 .toggle input{display:none}
-.toggle label{padding:.34rem .95rem;font-size:.92rem;cursor:pointer;transition:opacity .15s}
+.toggle label{
+  padding:.34rem .95rem;font-size:.92rem;cursor:pointer;transition:opacity .15s;opacity:.4
+}
+.toggle input:checked+label{opacity:1}
 .toggle .yes{background:var(--yes);color:#fff}
 .toggle .no {background:var(--no);color:#fff}
-.toggle label{opacity:.4}
-.toggle input:checked+label{opacity:1}
 .note{flex:1 1 100%;margin:.4rem 0 0;font-size:.85rem;color:var(--accent)}
 
-/* make / model */
+/* make / model row */
 .mm-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
 .mm-row div{flex:1 1 200px}
-.mm-row input{width:100%;padding:.5rem;border:1px solid var(--sep);border-radius:6px}
 
-/* Chemical Tests list */
+/* Chemical tests list */
 #chemTests ul{list-style:none;margin:0;padding:0}
 #chemTests li{padding:.8rem 0;border-bottom:1px solid var(--sep)}
 #chemTests li:last-child{border:none}
 #chemTests strong{display:block;margin-bottom:.3rem}
+
+/* Print tweaks */
+@media print{
+  #copyBtn,#essBar a{display:none!important}
+  body{background:#fff}
+}
 </style>
+<link rel="manifest"><!-- href injected at runtime -->
 </head>
 <body>
 
 <h1>Dishwasher Troubleshooting Helper</h1>
 
-<!-- ========= Essential Tests bar ========= -->
+<!-- ======== Essential Tests bar ======== -->
 <div id="essBar">
   <strong>Essential Tests:</strong>
   <a class="inline" href="https://grahamm89.github.io/referencetools/detergent-concentration.html" target="_blank" rel="noopener">
@@ -74,12 +102,12 @@ button:hover{opacity:.9}
   </a>
 </div>
 
-<!-- ========= 1. Quick Symptom Lookup ========= -->
+<!-- ======== 1. Quick Symptom Lookup ======== -->
 <section>
   <h2>1. Quick Symptom Lookup</h2>
   <label for="symptom">Observed symptom or issue:</label>
   <select id="symptom">
-    <option value="">-- choose symptom --</option>
+    <option value="">— choose symptom —</option>
     <option value="Tannin Stains">Tannin stains (tea / coffee / wine)</option>
     <option value="Starch">Starch residue</option>
     <option value="Foaming">Excessive foaming</option>
@@ -99,79 +127,35 @@ button:hover{opacity:.9}
   <div id="symptomResult" class="result"></div>
 </section>
 
-<!-- ========= 2. Essential Checks ========= -->
+<!-- ======== 2. Essential Checks ======== -->
 <section>
   <h2>2. Essential Checks</h2>
 
-  <!-- machine make / model -->
+  <!-- make / model -->
   <div class="mm-row">
-    <div><label for="mMake">Machine make</label><input id="mMake"></div>
-    <div><label for="mModel">Machine model</label><input id="mModel"></div>
+    <div><label for="mMake">Machine make</label><input id="mMake" autocomplete="off"></div>
+    <div><label for="mModel">Machine model</label><input id="mModel" autocomplete="off"></div>
   </div>
 
   <!-- seven toggle cards -->
-  <div class="qcard" data-key="dosingOn">
-    <p>1.&nbsp;Is the dosing equipment <strong>switched on</strong>?</p>
-    <div class="toggle">
-      <input type="radio" id="dosingOnY" name="dosingOn" value="Yes" checked><label class="yes" for="dosingOnY">Yes</label>
-      <input type="radio" id="dosingOnN" name="dosingOn" value="No"><label class="no" for="dosingOnN">No</label>
+  <template id="toggleTemplate">
+    <div class="qcard">
+      <p></p>
+      <div class="toggle">
+        <input type="radio"><label class="yes">Yes</label>
+        <input type="radio"><label class="no">No</label>
+      </div>
+      <div class="note" hidden></div>
     </div>
-  </div>
+  </template>
 
-  <div class="qcard" data-key="dosingWorking">
-    <p>2.&nbsp;Is the dosing equipment <strong>working correctly</strong>?</p>
-    <div class="toggle">
-      <input type="radio" id="dosingWorkY" name="dosingWorking" value="Yes" checked><label class="yes" for="dosingWorkY">Yes</label>
-      <input type="radio" id="dosingWorkN" name="dosingWorking" value="No"><label class="no" for="dosingWorkN">No</label>
-    </div>
-  </div>
-
-  <div class="qcard" data-key="temps">
-    <p>3.&nbsp;Are the temperatures correct?</p>
-    <div class="toggle">
-      <input type="radio" id="tempsY" name="temps" value="Yes" checked><label class="yes" for="tempsY">Yes</label>
-      <input type="radio" id="tempsN" name="temps" value="No"><label class="no" for="tempsN">No</label>
-    </div>
-    <div class="note">Pref: 40-55 °C pre-wash · 55-65 °C wash · 80-90 °C rinse · 60-70 °C low-temp</div>
-  </div>
-
-  <div class="qcard" data-key="jets">
-    <p>4.&nbsp;Is the machine working correctly, with all wash and rinse jets clear?</p>
-    <div class="toggle">
-      <input type="radio" id="jetsY" name="jets" value="Yes" checked><label class="yes" for="jetsY">Yes</label>
-      <input type="radio" id="jetsN" name="jets" value="No"><label class="no" for="jetsN">No</label>
-    </div>
-  </div>
-
-  <div class="qcard" data-key="practice">
-    <p>5.&nbsp;Are staff observing good practice (pre-scraping, racking well)?</p>
-    <div class="toggle">
-      <input type="radio" id="pracY" name="practice" value="Yes" checked><label class="yes" for="pracY">Yes</label>
-      <input type="radio" id="pracN" name="practice" value="No"><label class="no" for="pracN">No</label>
-    </div>
-  </div>
-
-  <div class="qcard" data-key="detergent">
-    <p>6.&nbsp;Is the correct detergent being used and are the tubes in the correct containers?</p>
-    <div class="toggle">
-      <input type="radio" id="detY" name="detergent" value="Yes" checked><label class="yes" for="detY">Yes</label>
-      <input type="radio" id="detN" name="detergent" value="No"><label class="no" for="detN">No</label>
-    </div>
-  </div>
-
-  <div class="qcard" data-key="titration">
-    <p>7.&nbsp;Is detergent at the correct strength?</p>
-    <div class="toggle">
-      <input type="radio" id="titY" name="titration" value="Yes" checked><label class="yes" for="titY">Yes</label>
-      <input type="radio" id="titN" name="titration" value="No"><label class="no" for="titN">No</label>
-    </div>
-  </div>
+  <div id="toggleHolder"></div>
 
   <div id="checklistResult" class="result"></div>
-  <button id="copyBtn" style="margin-top:.9rem">Copy to Youreka</button>
+  <button id="copyBtn" style="margin-top:.9rem">Copy Summary</button>
 </section>
 
-<!-- ========= 3. Chemical Tests ========= -->
+<!-- ======== 3. Chemical Tests ======== -->
 <section id="chemTests">
   <h2>3. Chemical Tests</h2>
   <ul>
@@ -182,100 +166,228 @@ button:hover{opacity:.9}
     </li>
     <li>
       <strong>Detecting Starch:</strong><br>
-      Add a drop of <em>ACID 1</em>, then a drop of <em>Iodide/Iodate</em> to the surface. A blue-black colour reveals starch.
+      Add a drop of <em>ACID&nbsp;1</em>, then a drop of <em>Iodide/Iodate</em> to the surface. A blue-black colour reveals starch.
     </li>
     <li>
       <strong>Detecting Limescale:</strong><br>
-      Apply a few drops of <em>ACID 3</em> to the suspected area. Bubbling indicates carbonate scale, which the acid will remove.
+      Apply a few drops of <em>ACID&nbsp;3</em> to the suspected area. Bubbling indicates carbonate scale, which the acid will remove.
     </li>
   </ul>
 </section>
 
-<!-- ================= JavaScript ================= -->
-<script>
-/* ---------- DATA for symptom lookup ---------- */
-const DATA={
- "Tannin Stains":{causes:"Tea or coffee and wine. Worse where glaze has eroded.",
-  consequences:"",actions:"Use chlorinated detergents or pre-soak with Suma Shine K2. Use Bactosol renovator in glass-washers."},
- "Starch":{causes:"Heated plates, long delays, greasy sticky foods, low detergent level, poor wash pressure, poor wash temperatures.",
-  consequences:"",actions:"Increase detergent, switch to more alkaline detergent, improve practices, raise temperatures, increase wash pressure."},
- "Foaming":{causes:"Low wash/rinse temperature, hand dish detergents in tank, high food soiling, high wash-tank level, poor rinse.",
-  consequences:"",actions:"Raise temperature, reduce rinse-aid, remove problem detergents, improve drainage, eliminate high-foam products."},
- "Drying Marks":{causes:"Poor rinse, low rinse-aid, incorrect rinse temperature, hard water, high solids, poor racking.",
-  consequences:"",actions:"Repair rinse, adjust rinse-aid, set correct temperature, use hard-water rinse-aid or de-ioniser, improve racking."},
- "Detergent Overuse":{causes:"Broken dosing gear, too-high set-point, scaled probe, broken fill valve, jammed solenoid.",
-  consequences:"",actions:"Repair equipment, descale/clean probe, lower set-point, match dose to hardness, free solenoid."},
- "Limescale":{causes:"No/broken softener, low detergent, wrong rinse-aid.",
-  consequences:"",actions:"Repair softener, increase detergent, use hard-water detergent and rinse-aid."},
- "Cracking Plastic":{causes:"Excess heat, non-ionic hand detergent, some rinse aids, very high chlorine.",
-  consequences:"",actions:"Lower rinse temperature, remove problem chemicals, use plastic-safe products A11/A8, reduce chlorine."},
- "Bits After Rinsing":{causes:"Poor rinse, dirty wash water, contaminated rinse water, coffee grounds/tea bags, poor racking.",
-  consequences:"",actions:"Repair rinse, change wash water, improve pre-scraping, flush rinse supply, improve racking."},
- "Detergent Carryover":{causes:"Poor rinse, very high detergent, low rinse pressure.",consequences:"",
-  actions:"Repair rinse, lower detergent, raise rinse pressure, clear jets."},
- "Cloudy Glasses":{causes:"Hard-water scale, detergent carry-over, high detergent, high solids.",
-  consequences:"",actions:"Increase detergent if low, improve rinse pressure/temperature, reduce detergent if high, install softener if needed."},
- "Rusty Cutlery":{causes:"Prolonged soaking, contact with salt or chlorinated products at high concentration.",
-  consequences:"",actions:"Shorten soak time, rinse promptly, dilute/remove chlorine, upgrade cutlery."},
- "Black SS Cutlery":{causes:"Silver dip, heat.",consequences:"",
-  actions:"Keep stainless steel away from Suma Silver D8 and excessive heat."},
- "Silver Tarnishing":{causes:"Sulphides (eggs/fires), chlorine, excessive heat.",
-  consequences:"",actions:"Remove sulphides & chlorine, reduce heat, burnish silver."},
- "Machine Scaled":{causes:"Hard-water scale forms when detergent insufficient in hard-water areas.",
-  consequences:"Porous scale harbours bacteria; wash quality poor; energy cost rises.",
-  actions:"Add salt to softener, ensure detergent present, descale with limescale remover."},
- "Wash Jets Blocked":{causes:"Debris blocks jets; water cannot pass.",
-  consequences:"Poor cleaning; plates must be rewashed.",
-  actions:"Clean jets before every wash; poke debris & flush; remove arms for thorough clean."}
-};
-
-/* ---------- Section 1: lookup ---------- */
-document.getElementById('symptom').addEventListener('change',e=>{
-  const key=e.target.value.trim(), panel=document.getElementById('symptomResult');
-  if(!key){panel.classList.remove('show');panel.innerHTML="";return;}
-  const d=DATA[key];
-  if(!d){panel.classList.remove('show');panel.innerHTML="<em>No data found</em>";return;}
-  panel.innerHTML=
-    `<p><strong>Causes:</strong> ${d.causes}</p>`+
-    (d.consequences? `<p><strong>Consequences:</strong> ${d.consequences}</p>`:"")+
-    `<p><strong>Possible solutions:</strong> ${d.actions}</p>`;
-  panel.classList.add('show');panel.scrollIntoView({behavior:'smooth',block:'start'});
-});
-
-/* ---------- Section 2: live advice ---------- */
-const toggles=document.querySelectorAll('.toggle input');
-function rVal(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||"";}
-function updateAdvice(){
-  const out=document.getElementById('checklistResult');
-  const list=[];
-  if(rVal('dosingOn')==='No')       list.push("Switch on dosing unit.");
-  if(rVal('dosingWorking')==='No')  list.push("Repair/calibrate dosing equipment.");
-  if(rVal('temps')==='No')          list.push("Verify temperatures.");
-  if(rVal('jets')==='No')           list.push("Clear wash & rinse jets.");
-  if(rVal('practice')==='No')       list.push("Improve pre-scraping / racking.");
-  if(rVal('detergent')==='No')      list.push("Connect correct detergent & tubes.");
-  if(rVal('titration')==='No')      list.push("Perform detergent titration.");
-  out.innerHTML=list.length?
-    `<h3>Checklist findings</h3><ul><li>${list.join("</li><li>")}</li></ul>`:
-    `<p>No obvious issues from the checklist.</p>`;
-  out.classList.add('show');
+<!-- ────────── SCRIPT ────────── -->
+<script type="application/json" id="symptomData">
+{
+ "Tannin Stains":{
+   "causes":"Tea, coffee, red-wine tannins adhere—worse where glaze has eroded.",
+   "actions":"Switch to a chlorinated detergent or pre-soak in Suma Shine K2. Renovate with Bactosol where possible."
+ },
+ "Starch":{
+   "causes":"Heated plates, long holds, sticky foods, low detergent or wash pressure/temperature.",
+   "actions":"Increase alkaline detergent, boost temp/pressure, improve pre-scraping."
+ },
+ "Foaming":{
+   "causes":"Low wash/rinse temp, hand-dish liquid in tank, high food load, high tank level, poor rinse.",
+   "actions":"Raise temps, reduce rinse-aid, skim foam, drain & refill, remove high-foam products."
+ },
+ "Drying Marks":{
+   "causes":"Weak rinse, low rinse-aid, hard water, low rinse temperature, poor racking.",
+   "actions":"Repair rinse, dose rinse-aid correctly, soften or de-ionise water, rack items angle-down."
+ },
+ "Detergent Overuse":{
+   "causes":"Broken pump, high set-point, scaled probe, faulty fill valve.",
+   "actions":"Calibrate/repair pump, descale probe, lower set-point, free fill valve."
+ },
+ "Limescale":{
+   "causes":"Hard water with no/failed softener, insufficient detergent, wrong rinse-aid.",
+   "actions":"Regenerate or repair softener, add suitable detergent, use hard-water rinse-aid."
+ },
+ "Cracking Plastic":{
+   "causes":"Excess heat, exposure to hand-dish liquid, aggressive rinse-aid, very high chlorine.",
+   "actions":"Lower rinse temp, remove problem chemicals, use plastic-safe range (A11/A8)."
+ },
+ "Bits After Rinsing":{
+   "causes":"Poor rinse, dirty wash water, coffee grounds/tea bags, poor racking.",
+   "actions":"Service rinse, refresh wash tank, improve pre-scrape, flush rinse supply."
+ },
+ "Detergent Carryover":{
+   "causes":"Poor rinse, high detergent concentration, low rinse pressure.",
+   "actions":"Repair rinse, dial back detergent, clear rinse jets, increase pressure."
+ },
+ "Cloudy Glasses":{
+   "causes":"Hard-water scale, detergent carry-over, too high detergent, high dissolved solids.",
+   "actions":"Soft water or suitable rinse-aid, optimise detergent dose, rinse pressure up."
+ },
+ "Rusty Cutlery":{
+   "causes":"Prolonged soaking, contact with salt or strong chlorine.",
+   "actions":"Shorten soak, rinse quickly, reduce chlorine, upgrade cutlery grade."
+ },
+ "Black SS Cutlery":{
+   "causes":"Contact with silver-dip or excess heat.",
+   "actions":"Keep stainless away from silver cleaner and high heat."
+ },
+ "Silver Tarnishing":{
+   "causes":"Sulphides (eggs/fire), chlorine, heat.",
+   "actions":"Minimise sulphide/chlorine contact, burnish, run lower temps."
+ },
+ "Machine Scaled":{
+   "causes":"Hard-water scale from insufficient detergent in hard areas.",
+   "actions":"Check salt & softener, descale with acid cleaner, ensure detergent dosing."
+ },
+ "Wash Jets Blocked":{
+   "causes":"Debris blocks jets—water can’t reach ware.",
+   "actions":"Remove & clean jets daily, flush thoroughly."
+ }
 }
-toggles.forEach(t=>t.addEventListener('change',updateAdvice));
-updateAdvice();
+</script>
 
-/* ---------- Copy to Youreka ---------- */
-document.getElementById('copyBtn').addEventListener('click',()=>{
-  let txt=`Machine Make: ${document.getElementById('mMake').value||"-"}\n`;
-  txt+=`Machine Model: ${document.getElementById('mModel').value||"-"}\n`;
-  document.querySelectorAll('.qcard').forEach((c,i)=>{
-    const q=c.querySelector('p').textContent.replace(/^\d+\.\s*/,"").trim();
-    txt+=`${i+1}. ${q} - ${rVal(c.dataset.key)}\n`;
+<script>
+(() => {
+  /* ── helpers ─────────────────────────────────────── */
+  const $ = sel => document.querySelector(sel);
+  const setHidden = (el,flag) => flag ? el.setAttribute('hidden','') : el.removeAttribute('hidden');
+  const ls = {
+    get: key => JSON.parse(localStorage.getItem(key) || 'null'),
+    set: (key,val) => localStorage.setItem(key,JSON.stringify(val))
+  };
+
+  /* ── symptom lookup ─────────────────────────────── */
+  const SYMPTOMS = JSON.parse($('#symptomData').textContent);
+  const symptomSel = $('#symptom');
+  const symptomResult = $('#symptomResult');
+
+  function renderSymptom(key){
+    if(!key){ symptomResult.classList.remove('show'); symptomResult.innerHTML=''; return; }
+    const d = SYMPTOMS[key];
+    if(!d){ symptomResult.innerHTML='<em>No data found</em>'; symptomResult.classList.add('show'); return; }
+    symptomResult.innerHTML = `
+      <p><strong>Likely causes:</strong> ${d.causes}</p>
+      <p><strong>Suggested actions:</strong> ${d.actions}</p>`;
+    symptomResult.classList.add('show');
+    symptomResult.scrollIntoView({behavior:'smooth',block:'start'});
+    ls.set('lastSymptom',key);
+  }
+
+  symptomSel.addEventListener('change',e=>renderSymptom(e.target.value));
+  /* restore last symptom */
+  const lastSym = ls.get('lastSymptom');
+  if(lastSym && SYMPTOMS[lastSym]){ symptomSel.value = lastSym; renderSymptom(lastSym); }
+
+  /* ── toggle checklist build ─────────────────────── */
+  const QUESTIONS = [
+    {key:'dosingOn',     text:'Is the dosing equipment switched on?'},
+    {key:'dosingWorking',text:'Is the dosing equipment working correctly?'},
+    {key:'temps',        text:'Are the temperatures correct?', note:'Pref: 40–55 °C pre-wash · 55–65 °C wash · 80–90 °C rinse · 60–70 °C low-temp'},
+    {key:'jets',         text:'Is the machine working correctly, with all wash and rinse jets clear?'},
+    {key:'practice',     text:'Are staff observing good practice (pre-scraping, racking well)?'},
+    {key:'detergent',    text:'Is the correct detergent used and tubes in the right containers?'},
+    {key:'titration',    text:'Is detergent at the correct strength?'}
+  ];
+
+  const holder = $('#toggleHolder');
+  const tpl = $('#toggleTemplate').content;
+
+  QUESTIONS.forEach((q,i)=>{
+    const node = document.importNode(tpl,true);
+    const p   = node.querySelector('p'); p.textContent = `${i+1}. ${q.text}`;
+    const yes = node.querySelector('.yes'); const no  = node.querySelector('.no');
+    const yIn = node.querySelectorAll('input')[0]; const nIn = node.querySelectorAll('input')[1];
+    yIn.id = `${q.key}Y`; nIn.id = `${q.key}N`;
+    yIn.name = nIn.name = q.key;
+    yIn.value='Yes'; nIn.value='No';
+    yes.setAttribute('for',yIn.id); no.setAttribute('for',nIn.id);
+    if(q.note){
+      const note = node.querySelector('.note');
+      note.textContent = q.note;
+      setHidden(note,false);
+    }
+    /* restore saved choice */
+    const saved = ls.get('toggle_'+q.key) || 'Yes';
+    if(saved==='No'){ nIn.checked=true; } else { yIn.checked=true; }
+    holder.appendChild(node);
   });
-  (navigator.clipboard?.writeText(txt)||Promise.reject()).then(()=>alert("Copied!")).catch(()=>{
-    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);
-    ta.select();document.execCommand('copy');document.body.removeChild(ta);alert("Copied!");
+
+  /* ── live advice ────────────────────────────────── */
+  const checklistOut = $('#checklistResult');
+  function val(name){ return document.querySelector(`input[name="${name}"]:checked`)?.value || ''; }
+
+  function compileAdvice(){
+    const msgs=[];
+    if(val('dosingOn')==='No')       msgs.push('Switch on dosing unit.');
+    if(val('dosingWorking')==='No')  msgs.push('Repair or calibrate dosing equipment.');
+    if(val('temps')==='No')          msgs.push('Verify and adjust wash & rinse temperatures.');
+    if(val('jets')==='No')           msgs.push('Clear wash and rinse jets.');
+    if(val('practice')==='No')       msgs.push('Improve pre-scraping and racking practices.');
+    if(val('detergent')==='No')      msgs.push('Connect correct detergent containers & tubing.');
+    if(val('titration')==='No')      msgs.push('Perform detergent titration test.');
+
+    checklistOut.innerHTML = msgs.length ?
+      `<h3>Checklist findings</h3><ul><li>${msgs.join('</li><li>')}</li></ul>` :
+      `<p>No obvious issues from the checklist.</p>`;
+    checklistOut.classList.add('show');
+  }
+  compileAdvice();
+
+  holder.addEventListener('change',e=>{
+    if(e.target.matches('input[type="radio"]')){
+      ls.set('toggle_'+e.target.name,e.target.value);
+      compileAdvice();
+    }
   });
-});
+
+  /* ── copy summary ──────────────────────────────── */
+  $('#copyBtn').addEventListener('click',()=>{
+    let txt = `Machine Make: ${$('#mMake').value || '-'}\n`;
+    txt    += `Machine Model: ${$('#mModel').value || '-'}\n\n`;
+    QUESTIONS.forEach((q,i)=>{
+      txt += `${i+1}. ${q.text} - ${val(q.key)}\n`;
+    });
+    txt += '\n--- Symptom ---\n';
+    txt += symptomSel.value ? `${symptomSel.value}\n` : 'None selected\n';
+    txt += symptomResult.textContent.trim() ? '\n' + symptomResult.textContent.trim() : '';
+    (navigator.clipboard?.writeText(txt) || Promise.reject()).then(()=>{
+      alert('Summary copied to clipboard!');
+    }).catch(()=>{
+      const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      alert('Summary copied!');
+    });
+  });
+
+  /* ── remember make/model ───────────────────────── */
+  ['mMake','mModel'].forEach(id=>{
+    const el=$( '#' + id);
+    el.value = ls.get(id) || '';
+    el.addEventListener('input',()=>ls.set(id,el.value.trim()));
+  });
+
+  /* ── PWA (optional, auto-installs) ─────────────── */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      /* manifest on the fly */
+      const manifest = {
+        name:'Dishwasher Helper',
+        short_name:'DW Helper',
+        start_url:'.',
+        display:'standalone',
+        background_color:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+        theme_color:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+        icons:[]
+      };
+      const mURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+      document.querySelector('link[rel="manifest"]').href = mURL;
+
+      /* service worker */
+      const swCode = `
+        const CACHE='dw-helper-v1';
+        self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.href]))));
+        self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+      `;
+      const swURL = URL.createObjectURL(new Blob([swCode],{type:'application/javascript'}));
+      navigator.serviceWorker.register(swURL);
+    });
+  }
+})();
 </script>
 </body>
 </html>
