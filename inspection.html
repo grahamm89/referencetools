@@ -1,45 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Site Chemical & Equipment Inspection</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {padding-bottom:4rem;}
-    .tab-content {margin-top:1.5rem;}
-    textarea {resize:vertical;}
-    .sticky-btns{position:fixed;bottom:1rem;right:1rem;z-index:1000;}
-  </style>
+<meta charset="utf-8">
+<title>Site Chemical & Equipment Inspection</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body{padding-bottom:4rem;}
+  .tab-content{margin-top:1.5rem;}
+  textarea{resize:vertical;}
+  .sticky-btns{position:fixed;bottom:1rem;right:1rem;z-index:1000;}
+  .qa-text{font-family:monospace;min-height:200px;white-space:pre-wrap;}
+</style>
 </head>
 <body>
 <div class="container my-3">
 
   <h1 class="h3 text-center mb-4">Site Chemical &amp; Equipment Inspection</h1>
 
-  <!-- quick reference image -->
-  <div class="text-center">
-    <img src="controls.jpg" class="img-fluid rounded shadow-sm mb-4" style="max-width:320px"
-         alt="Control key diagram (plus / minus, cursor, action & menu)">
-  </div>
-
   <!-- Tabs -->
   <ul class="nav nav-tabs" id="mainTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="chem-tab" data-bs-toggle="tab" data-bs-target="#chem" type="button" role="tab">Chemical Dispensing</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="eco-tab" data-bs-toggle="tab" data-bs-target="#eco" type="button" role="tab">Ecoshot Volumes</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="dish-tab" data-bs-toggle="tab" data-bs-target="#dish" type="button" role="tab">Dishwasher & Water</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="laundry-tab" data-bs-toggle="tab" data-bs-target="#laundry" type="button" role="tab">Laundry</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="stock-tab" data-bs-toggle="tab" data-bs-target="#stock" type="button" role="tab">Storeroom Stock</button>
-    </li>
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#chem" type="button">Chemical Dispensing</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#eco" type="button">Ecoshot Volumes</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dish" type="button">Dishwasher &amp; Water</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#laundry" type="button">Laundry</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#stock" type="button">Storeroom Stock</button></li>
   </ul>
 
   <div class="tab-content">
@@ -47,31 +32,32 @@
     <!-- Chemical Dispensing -->
     <div class="tab-pane fade show active" id="chem" role="tabpanel">
       <h2 class="h5 mt-3">Chemical Dispensing Equipment</h2>
+
       <div class="form-check">
         <input class="form-check-input" type="checkbox" id="doseOK">
         <label class="form-check-label" for="doseOK">All dosing equipment functioning &amp; delivering correct dosage</label>
       </div>
+
       <div class="row mt-2">
-        <div class="col-8">
+        <div class="col-12">
           <label for="quat" class="form-label">Quat test (D10) ppm result</label>
           <input type="number" class="form-control" id="quat" placeholder="ppm">
         </div>
-        <div class="col-4 d-flex align-items-end">
-          <button class="btn btn-outline-secondary w-100" type="button" onclick="saveData()">Save</button>
-        </div>
       </div>
+
       <div class="form-check mt-2">
         <input class="form-check-input" type="checkbox" id="approvedSystems">
         <label class="form-check-label" for="approvedSystems">All chemicals connected to approved systems</label>
       </div>
+
       <div class="form-check mt-2">
         <input class="form-check-input" type="checkbox" id="enhancePelican">
         <label class="form-check-label" for="enhancePelican">Enhance dosed via pelican pump</label>
       </div>
 
-      <label class="form-label mt-3">Report faulty / manual dosing setups (upload photos):</label>
+      <label class="form-label mt-3">Report faulty / manual dosing setups (photo upload):</label>
       <input class="form-control mb-3" type="file" multiple accept="image/*">
-      <textarea class="form-control" rows="3" placeholder="Comments / actions taken"></textarea>
+      <textarea class="form-control" id="chemComments" rows="3" placeholder="Comments / actions taken"></textarea>
     </div>
 
     <!-- Ecoshot -->
@@ -80,11 +66,9 @@
       <div class="table-responsive">
         <table class="table table-sm align-middle">
           <thead class="table-light">
-          <tr><th>Location</th><th>Product</th><th>Bottle&nbsp;Dose (ml)</th><th>Bucket&nbsp;Dose (ml)</th></tr>
+            <tr><th>Location</th><th>Product</th><th>Bottle&nbsp;Dose (ml)</th><th>Bucket&nbsp;Dose (ml)</th></tr>
           </thead>
-          <tbody id="ecoTable">
-            <!-- rows injected by JS -->
-          </tbody>
+          <tbody id="ecoTable"></tbody>
         </table>
       </div>
       <button class="btn btn-outline-secondary" onclick="addEcoRow()">Add&nbsp;Row</button>
@@ -93,7 +77,7 @@
     <!-- Dishwasher -->
     <div class="tab-pane fade" id="dish" role="tabpanel">
       <h2 class="h5 mt-3">Dishwasher Titration &amp; Water Hardness</h2>
-      <p>Fill in the results and attach photos where relevant.</p>
+      <p class="small">Fill in the results and attach photos where relevant.</p>
       <div id="dishList"></div>
       <button class="btn btn-outline-secondary mb-3" onclick="addDishRecord()">Add&nbsp;Dishwasher</button>
     </div>
@@ -109,24 +93,24 @@
         <input class="form-check-input" type="checkbox" id="laundryUnitOK">
         <label class="form-check-label" for="laundryUnitOK">Laundry dosing units functioning correctly</label>
       </div>
+
       <div class="form-check mt-2">
         <input class="form-check-input" type="checkbox" id="laundryDoseRight">
         <label class="form-check-label" for="laundryDoseRight">Dosing matches site water hardness</label>
       </div>
-      <div class="row mt-3">
-        <div class="col-6">
-          <label class="form-label" for="waterHardness">Water hardness (°fH or ppm CaCO₃)</label>
-          <input type="number" class="form-control" id="waterHardness">
-        </div>
-        <div class="col-6">
-          <label class="form-label" for="washCount">Current wash count</label>
-          <input type="number" class="form-control" id="washCount">
-        </div>
+
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" id="waterHardnessDone">
+        <label class="form-check-label" for="waterHardnessDone">Water hardness checked / recorded</label>
       </div>
-      <div class="mt-3">
-        <label class="form-label">Comments / actions:</label>
-        <textarea class="form-control" rows="3"></textarea>
+
+      <div class="form-check mt-2">
+        <input class="form-check-input" type="checkbox" id="washCountReset">
+        <label class="form-check-label" for="washCountReset">Current wash count recorded / reset</label>
       </div>
+
+      <label class="form-label mt-3">Comments / actions:</label>
+      <textarea class="form-control" id="laundryComments" rows="3"></textarea>
     </div>
 
     <!-- Stock -->
@@ -136,11 +120,9 @@
       <div class="table-responsive">
         <table class="table table-sm align-middle" id="stockTable">
           <thead class="table-light">
-          <tr><th>SKU</th><th>Description</th><th style="width:120px">Quantity</th></tr>
+            <tr><th>SKU</th><th>Description</th><th style="width:120px">Quantity</th></tr>
           </thead>
-          <tbody>
-            <!-- rows injected by JS -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
       <div class="d-flex gap-2">
@@ -152,9 +134,9 @@
   </div><!-- /tab-content -->
 </div><!-- /container -->
 
-<!-- sticky save button -->
+<!-- Sticky copy summary button -->
 <div class="sticky-btns">
-  <button class="btn btn-primary shadow" onclick="saveData()">💾 Save&nbsp;Progress</button>
+  <button class="btn btn-primary shadow" onclick="openQASummary()">📋 Copy&nbsp;Q&amp;A&nbsp;Summary</button>
 </div>
 
 <!-- L5000 modal -->
@@ -168,35 +150,48 @@
       <div class="modal-body">
 <pre style="white-space:pre-wrap">
 PASSWORD
-• Hold MENU 5 s → Password screen “???”
-• Use + and CURSOR to enter 890
-• Press MENU twice → wash-count screen
+Press & hold MENU 5 s → Password screen “???”
+Use + and CURSOR to enter 8-9-0
+Press MENU twice → Wash Count screen
 
-RESET WASH COUNTS
-• F1 shows counts since last reset
-• Hold ACTION key → resets to 000
-• Press + → F2 … repeat for each formula
+RESETTING THE WASH COUNTS
+F1 shows wash counts since last reset.
+Hold ACTION key → resets that formula to 000.
+Press + to advance to F2, repeat for all formulas in use.
 
-RETURN TO HOME
-• MUST return to Home or no product doses
-  – EITHER power-cycle (switch under dispenser) wait 10 s
-  – OR hold MENU 5 s
+RETURNING TO HOME SCREEN
+MUST return to Home before starting washer or NO PRODUCT will dose.
+Option 1: Power-cycle (switch under dispenser, right-hand side), wait green light out, count to 10, power back on → Home.
+Option 2: Press & hold MENU ~5 s to return directly to Home.
 </pre>
-
-<!-- inline reference image -->
-<img class="img-fluid rounded shadow-sm mt-2"
-     alt="Control key diagram"
-     src="https://raw.githubusercontent.com/grahamm89/referencetools/refs/heads/main/c66587ab-799a-4a10-a338-8e1077678481.jpeg">
-    
-      </div><!-- /modal-body -->
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Bootstrap JS bundle -->
+<!-- Q&A summary modal -->
+<div class="modal fade" id="qaModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Q&amp;A Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="qaText" class="form-control qa-text" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="copyQA()">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/* ---------- data templates ---------- */
+/* ===========================================================
+   Data templates
+   =========================================================== */
 const ecoDefaults=[
   {loc:"Housekeeping",prod:"Oxivir",b:"15",bucket:"20"},
   {loc:"Housekeeping",prod:"Good Sense Breakdown",b:"15",bucket:""},
@@ -233,13 +228,15 @@ const stockList=`7508226,Suma Star D1 2x5L W1779+
 7522906,Horizon Bio 8.4Kg GB,IRL
 6973314,Clax Peroxy 43B1 10Kg W3660`.split('\\n');
 
-/* ---------- populate Ecoshot table ---------- */
+/* ===========================================================
+   Build Ecoshot table
+   =========================================================== */
 function renderEco(){
   const tbody=document.getElementById('ecoTable');
   tbody.innerHTML='';
-  ecoDefaults.forEach((r,i)=>addEcoRow(r,i));
+  ecoDefaults.forEach(row=>addEcoRow(row));
 }
-function addEcoRow(data={},index){
+function addEcoRow(data={}){
   const tbody=document.getElementById('ecoTable');
   const tr=document.createElement('tr');
   tr.innerHTML=`
@@ -250,11 +247,13 @@ function addEcoRow(data={},index){
   tbody.appendChild(tr);
 }
 
-/* ---------- dishwasher records ---------- */
+/* ===========================================================
+   Dishwasher records
+   =========================================================== */
 function addDishRecord(data={}){
   const wrap=document.getElementById('dishList');
   const card=document.createElement('div');
-  card.className="card mb-3";
+  card.className='card mb-3';
   card.innerHTML=`
     <div class="card-body p-3">
       <div class="d-flex justify-content-between">
@@ -262,17 +261,19 @@ function addDishRecord(data={}){
         <button class="btn btn-sm btn-outline-danger" onclick="this.closest('.card').remove()">Remove</button>
       </div>
       <div class="row g-2">
-        <div class="col-6"><input class="form-control" placeholder="Location" value="${data.loc||''}"></div>
-        <div class="col-6"><input class="form-control" placeholder="Titration result" value="${data.titr||''}"></div>
-        <div class="col-6"><input class="form-control" placeholder="Water hardness" value="${data.wh||''}"></div>
+        <div class="col-6"><input class="form-control dish-loc" placeholder="Location" value="${data.loc||''}"></div>
+        <div class="col-6"><input class="form-control dish-titr" placeholder="Titration result" value="${data.titr||''}"></div>
+        <div class="col-6"><input class="form-control dish-wh" placeholder="Water hardness" value="${data.wh||''}"></div>
         <div class="col-6"><input class="form-control" type="file" accept="image/*"></div>
       </div>
-      <textarea class="form-control mt-2" rows="2" placeholder="Comments">${data.cmt||''}</textarea>
+      <textarea class="form-control mt-2 dish-cmt" rows="2" placeholder="Comments">${data.cmt||''}</textarea>
     </div>`;
   wrap.appendChild(card);
 }
 
-/* ---------- stock list ---------- */
+/* ===========================================================
+   Stock table
+   =========================================================== */
 function renderStock(){
   const tbody=document.querySelector('#stockTable tbody');
   tbody.innerHTML='';
@@ -287,17 +288,20 @@ function renderStock(){
   });
 }
 
-/* ---------- copy / download ---------- */
+/* ===========================================================
+   Stock copy / download
+   =========================================================== */
 function copyStock(){
   const rows=[...document.querySelectorAll('#stockTable tbody tr')];
   const txt=rows.map(r=>{
     const sku=r.cells[0].textContent.trim();
     const desc=r.cells[1].textContent.trim();
     const qty=r.querySelector('input').value||'';
-    return `${sku}\t${desc}\t${qty}`;
+    return `${sku}\\t${desc}\\t${qty}`;
   }).join('\\n');
-  navigator.clipboard.writeText(txt).then(()=>alert('Stock list copied to clipboard'));
+  navigator.clipboard.writeText(txt).then(()=>alert('Stock list copied to clipboard.'));
 }
+
 function downloadCSV(){
   const rows=[...document.querySelectorAll('#stockTable tbody tr')];
   const csv=rows.map(r=>{
@@ -312,60 +316,98 @@ function downloadCSV(){
   a.click();
 }
 
-/* ---------- localStorage ---------- */
-function saveData(){
-  localStorage.setItem('inspectionData',JSON.stringify({
-    chem:{
-      doseOK:document.getElementById('doseOK').checked,
-      quat:document.getElementById('quat').value,
-      approvedSystems:document.getElementById('approvedSystems').checked,
-      enhancePelican:document.getElementById('enhancePelican').checked
-    },
-    eco:[...document.querySelectorAll('#ecoTable tr')].map(tr=>{
-      return [...tr.querySelectorAll('input')].map(i=>i.value);
-    }),
-    laundry:{
-      ok:document.getElementById('laundryUnitOK').checked,
-      right:document.getElementById('laundryDoseRight').checked,
-      hardness:document.getElementById('waterHardness').value,
-      wash:document.getElementById('washCount').value
-    },
-    stock:[...document.querySelectorAll('#stockTable tbody tr')].map(tr=>tr.querySelector('input').value)
-  }));
-  alert('Progress saved locally');
-}
-function loadData(){
-  try{
-    const d=JSON.parse(localStorage.getItem('inspectionData')||'{}');
-    if(d.chem){
-      document.getElementById('doseOK').checked=d.chem.doseOK||false;
-      document.getElementById('quat').value=d.chem.quat||'';
-      document.getElementById('approvedSystems').checked=d.chem.approvedSystems||false;
-      document.getElementById('enhancePelican').checked=d.chem.enhancePelican||false;
+/* ===========================================================
+   Q&A summary
+   =========================================================== */
+function yesNo(b){return b?'Yes':'No';}
+
+function buildQASummary(){
+  let out=[];
+  // Chemical Dispensing
+  out.push('=== Chemical Dispensing Equipment ===');
+  out.push('All dosing equipment functioning: '+yesNo(document.getElementById('doseOK').checked));
+  const quat=document.getElementById('quat').value.trim();
+  if(quat) out.push('Quat test (D10) ppm result: '+quat);
+  out.push('All chemicals on approved systems: '+yesNo(document.getElementById('approvedSystems').checked));
+  out.push('Enhance via pelican pump: '+yesNo(document.getElementById('enhancePelican').checked));
+  const chemC=document.getElementById('chemComments').value.trim();
+  if(chemC) out.push('Comments: '+chemC);
+
+  // Ecoshot rows
+  out.push('\\n=== Ecoshot Dispensing Volumes ===');
+  const ecoRows=[...document.querySelectorAll('#ecoTable tr')];
+  ecoRows.forEach(tr=>{
+    const [loc,prod,b,bucket]=[...tr.querySelectorAll('input')].map(i=>i.value.trim());
+    if(loc||prod||b||bucket){
+      out.push(`${loc||''} | ${prod||''} | Bottle:${b||'-'}ml | Bucket:${bucket||'-'}ml`);
     }
-    if(d.eco){ d.eco.forEach((arr,i)=>{
-      const tr=document.querySelectorAll('#ecoTable tr')[i];
-      if(tr) arr.forEach((v,j)=>tr.querySelectorAll('input')[j].value=v);
-    });}
-    if(d.laundry){
-      document.getElementById('laundryUnitOK').checked=d.laundry.ok||false;
-      document.getElementById('laundryDoseRight').checked=d.laundry.right||false;
-      document.getElementById('waterHardness').value=d.laundry.hardness||'';
-      document.getElementById('washCount').value=d.laundry.wash||'';
-    }
-    if(d.stock){
-      d.stock.forEach((qty,i)=>{
-        const tr=document.querySelectorAll('#stockTable tbody tr')[i];
-        if(tr) tr.querySelector('input').value=qty;
-      });
-    }
-  }catch(e){console.warn(e);}
+  });
+  if(ecoRows.length===0) out.push('(no rows)');
+
+  // Dishwashers
+  out.push('\\n=== Dishwasher Titration & Water Hardness ===');
+  const cards=[...document.querySelectorAll('#dishList .card')];
+  if(cards.length===0){
+    out.push('(none recorded)');
+  }else{
+    cards.forEach((c,i)=>{
+      const loc=c.querySelector('.dish-loc').value.trim();
+      const titr=c.querySelector('.dish-titr').value.trim();
+      const wh=c.querySelector('.dish-wh').value.trim();
+      const cmt=c.querySelector('.dish-cmt').value.trim();
+      out.push(`Dishwasher ${i+1}: ${loc||'(no location)'}`);
+      if(titr) out.push('  Titration: '+titr);
+      if(wh)   out.push('  Water hardness: '+wh);
+      if(cmt)  out.push('  Comments: '+cmt);
+    });
+  }
+
+  // Laundry
+  out.push('\\n=== Laundry Equipment & Dosing Monitoring ===');
+  out.push('Laundry dosing units functioning: '+yesNo(document.getElementById('laundryUnitOK').checked));
+  out.push('Dosing matches site water hardness: '+yesNo(document.getElementById('laundryDoseRight').checked));
+  out.push('Water hardness checked / recorded: '+yesNo(document.getElementById('waterHardnessDone').checked));
+  out.push('Wash count recorded / reset: '+yesNo(document.getElementById('washCountReset').checked));
+  const lC=document.getElementById('laundryComments').value.trim();
+  if(lC) out.push('Comments: '+lC);
+
+  // We do NOT automatically include full stock list here (can be huge); note where to get it.
+  out.push('\\n=== Storeroom Stock ===');
+  out.push('Use the Stock tab → Copy to Clipboard / Export CSV for full list.');
+  // (optional: include non-zero qty lines below)
+  const stockRows=[...document.querySelectorAll('#stockTable tbody tr')];
+  const used=stockRows.filter(r=>r.querySelector('input').value.trim()!=='' && r.querySelector('input').value.trim()!=='0');
+  if(used.length){
+    out.push('Entered quantities:');
+    used.forEach(r=>{
+      const sku=r.cells[0].textContent.trim();
+      const desc=r.cells[1].textContent.trim();
+      const qty=r.querySelector('input').value.trim();
+      out.push(`  ${sku} | ${desc} | Qty:${qty}`);
+    });
+  }
+  return out.join('\\n');
 }
 
-/* ---------- init ---------- */
+function openQASummary(){
+  const txt=buildQASummary();
+  document.getElementById('qaText').value=txt;
+  const modal=new bootstrap.Modal(document.getElementById('qaModal'));
+  modal.show();
+}
+
+function copyQA(){
+  const txt=document.getElementById('qaText').value;
+  navigator.clipboard.writeText(txt).then(()=>{
+    alert('Q&A summary copied to clipboard.');
+  });
+}
+
+/* ===========================================================
+   Init
+   =========================================================== */
 renderEco();
 renderStock();
-loadData();
 </script>
 </body>
 </html>
