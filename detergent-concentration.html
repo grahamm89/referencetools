@@ -1,161 +1,302 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Detergent Concentration Tool</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 15px;
-      padding: 0;
-      background: #f8f9fa;
-      color: #333;
-    }
-    h1 {
-      color: #004085;
-    }
-    select, table {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-    select {
-      padding: 10px;
-      font-size: 1em;
-    }
-    table {
-      border-collapse: collapse;
-      background: #fff;
-    }
-    th, td {
-      border: 1px solid #dee2e6;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #e9ecef;
-    }
-    .chlorinated {
-      background-color: #fff3cd;
-      border-left: 5px solid #ffc107;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .instructions {
-      background: #e2f0d9;
-      padding: 10px;
-      border-left: 5px solid #28a745;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Detergent Concentration Tool</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest"><!-- href is injected at runtime -->
+<style>
+/* ─────────────────────────── 1. THEME & RESET */
+:root{
+  --brand-blue:#004085;
+  --accent:#28a745;
+  --warning-bg:#fff3cd;
+  --warning-border:#ffc107;
+  --table-head-bg:#e9ecef;
+  --light-bg:#f8f9fa;
+  --text:#333;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --brand-blue:#85b7ff;
+    --accent:#34d058;
+    --warning-bg:#3c2f00;
+    --warning-border:#ffdf5d;
+    --table-head-bg:#1e1e1e;
+    --light-bg:#111;
+    --text:#eee;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* ─────────────────────────── 2. LAYOUT */
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--light-bg);
+  color:var(--text);
+  line-height:1.4;
+  padding:1rem;
+}
+h1{color:var(--brand-blue);margin-bottom:.5rem}
+label{display:block;margin:.5rem 0 .25rem}
+input,select,button{
+  width:100%;padding:.6rem;font-size:1rem;margin-bottom:1rem;
+}
+button{cursor:pointer;border:1px solid var(--brand-blue);background:#fff}
+button:hover,button:focus{background:var(--brand-blue);color:#fff}
+
+.table-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #dee2e6;padding:.4rem;text-align:center}
+th{background:var(--table-head-bg)}
+.selected{background:var(--accent);color:#fff}
+.fade-in{animation:fade .4s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* utility */
+.p-2{padding:10px}
+
+/* alerts & notes */
+.chlorinated{
+  background:var(--warning-bg);
+  border-left:5px solid var(--warning-border);
+  margin-bottom:1rem;
+}
+.instructions{
+  background:#e2f0d9;
+  border-left:5px solid var(--accent);
+  margin-top:1rem;
+}
+.instructions ol{padding-left:1.25rem}
+.instructions li{margin:.4rem 0}
+
+/* print optimisation */
+@media print{
+  #filterInput,#productSelect,#copyBtn,#printBtn{display:none}
+  body{padding:0;background:#fff}
+}
+</style>
 </head>
 <body>
+<main>
   <h1>Detergent Concentration Tool</h1>
-  <label for="productSelect"><strong>Select a product:</strong></label>
-  <select id="productSelect">
-    <option value="">-- Choose a product --</option>
-  </select>
 
-  <div id="chlorinatedWarning" class="chlorinated" style="display:none;">
+  <label for="filterInput"><strong>Type to filter products:</strong></label>
+  <input id="filterInput" type="search" placeholder="Start typing… e.g. Suma" autocomplete="off" aria-label="Filter products">
+
+  <label for="productSelect"><strong>Select a product:</strong></label>
+  <select id="productSelect" size="8" aria-describedby="chlorinatedWarning"></select>
+
+  <div id="chlorinatedWarning" class="chlorinated p-2" role="alert" hidden>
     <strong>Note:</strong> This is a <strong>chlorinated product</strong>. Add 3 drops of <strong>Sodium Thiosulphate</strong> in Step 2.
   </div>
 
-  <table id="resultTable" style="display:none;">
-    <thead>
-      <tr>
-        <th>Concentration</th>
-        <th>0.5g/L</th>
-        <th>1.0g/L</th>
-        <th>1.5g/L</th>
-        <th>2.0g/L</th>
-        <th>3.0g/L</th>
-        <th>6.0g/L</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr id="dropRow">
-        <td>Drops</td>
-        <td id="c0"></td>
-        <td id="c1"></td>
-        <td id="c2"></td>
-        <td id="c3"></td>
-        <td id="c4"></td>
-        <td id="c5"></td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-scroll">
+    <table id="resultTable" hidden>
+      <thead>
+        <tr>
+          <th>Concentration</th>
+          <th>0.5 g/L</th><th>1.0 g/L</th><th>1.5 g/L</th>
+          <th>2.0 g/L</th><th>3.0 g/L</th><th>6.0 g/L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="dropRow">
+          <td>Drops</td>
+          <td id="c0"></td><td id="c1"></td><td id="c2"></td>
+          <td id="c3"></td><td id="c4"></td><td id="c5"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div class="instructions" id="instructions" style="display:none;">
+  <label for="dropsInput" hidden id="dropsLabel"><strong>Reverse lookup – enter drop count:</strong></label>
+  <input type="number" id="dropsInput" min="1" placeholder="e.g. 7" hidden>
+
+  <div class="instructions p-2" id="instructions" hidden>
     <h3>Instructions</h3>
     <ol>
-      <li>Fill the test tube to the 5ml mark with water from the wash tank.</li>
-      <li id="chlorineStep" style="display:none;">Add 3 drops of Sodium Thiosulphate.</li>
+      <li>Fill the test tube to the 5 ml mark with water from the wash tank.</li>
+      <li id="chlorineStep" hidden>Add 3 drops of Sodium Thiosulphate.</li>
       <li>Add 1 drop of Indicator Reagent — solution will turn pink.</li>
-      <li>Select the correct acid by reference to table 3. (ACID 3 is 4 times the strength of ACID 1)</li>
+      <li>Select the correct acid by reference to table 3 (ACID 3 is 4 × strength of ACID 1).</li>
       <li>Add the ACID 1 or 3 a drop at a time, holding dropper bottle vertically. Swirl after each addition.</li>
       <li>Continue until the colour changes from pink to colourless.</li>
       <li>Count number of drops and read product concentration from table 2.</li>
     </ol>
   </div>
 
-  <script>
-    const products = {
-      "Bactosol Cabinet Det": ["-", "-", "-", "1", "2", "4"],
-      "Bactosol Extra": ["1", "2", "3", "5", "9", ""],
-      "Bryta Dishwashing Det": ["4", "7", "11", "15", "22", "44"],
-      "Suma Super L1*": ["1", "3", "4", "6", "9", "17"],
-      "Suma Ultra L2L": ["3", "6", "9", "12", "18", "35"],
-      "Suma Lima L3*": ["2", "4", "5", "7", "11", "22"],
-      "Suma Special L4L": ["3", "6", "9", "12", "18", "35"],
-      "Suma Nova L6L": ["2", "5", "7", "10", "14", "29"],
-      "Suma Nova Pur-Eco L6": ["3", "6", "9", "12", "18", "36"],
-      "Suma Tera L56": ["3", "7", "10", "14", "21(5)", "42 (10)"],
-      "Suma Combi LA6": ["3", "5", "8", "10", "16", "31"],
-      "Suma Combi Alu LA10": ["2", "3", "5", "7", "10", "21"],
-      "Suma Linos L6.8L": ["2", "4", "6", "8", "13", "25"],
-      "Suma Alu L10": ["1", "3", "4", "6", "9", "18"],
-      "Suma Med Alu L10": ["2", "4", "5", "7", "11", "22"],
-      "Suma Jade L8 pur eco": ["2", "4", "5", "7", "11", "22"],
-      "Sure Machine Detergent": ["3", "6", "9", "12", "18 (5)", "36 (9)"],
-      "Suma Polywash Detergent": ["3", "7", "10", "14", "21(5)", "42 (10)"],
-      "Suma Mega L52": ["7 (2)", "14 (3)", "20 (5)", "27 (7)", "10", "20"],
-      "Suma Revoflow Max P1*": ["14 (3)", "27 (7)", "41 (10)", "54 (14)", "20", "41"],
-      "Suma Revoflow Max P2": ["14 (3)", "28 (7)", "42 (10)", "56 (14)", "21", "41"],
-      "Suma Revoflow Max PE 0P P2": ["17 (4)", "33 (8)", "50 (12)", "67 (16)", "25", "49"],
-      "Suma Revoflow Clean P5*": ["5", "11", "16 (4)", "22 (5)", "32 (8)", "16"],
-      "Suma Revoflow Safe P9*": ["3", "6", "10", "13", "19 (5)", "39 (10)"],
-      "Suma Revoflow Safe PE P10": ["5", "10 (2)", "14 (4)", "19 (5)", "29 (7)", "57 (14)"]
-    };
+  <button id="copyBtn" hidden>Copy results to clipboard</button>
+  <button id="printBtn" hidden>Print instructions</button>
+</main>
 
-    const select = document.getElementById("productSelect");
-    const resultTable = document.getElementById("resultTable");
-    const chlorinatedWarning = document.getElementById("chlorinatedWarning");
-    const chlorineStep = document.getElementById("chlorineStep");
-    const instructions = document.getElementById("instructions");
+<!-- ─────────────────────────── DATA (kept inside HTML) -->
+<script type="application/json" id="detergentData">
+[
+  {"name":"Bactosol Cabinet Det","drops":["-","-","-","1","2","4"],"chlorinated":false},
+  {"name":"Bactosol Extra","drops":["1","2","3","5","9",""],"chlorinated":false},
+  {"name":"Bryta Dishwashing Det","drops":["4","7","11","15","22","44"],"chlorinated":false},
+  {"name":"Suma Super L1*","drops":["1","3","4","6","9","17"],"chlorinated":true},
+  {"name":"Suma Ultra L2L","drops":["3","6","9","12","18","35"],"chlorinated":false},
+  {"name":"Suma Lima L3*","drops":["2","4","5","7","11","22"],"chlorinated":true},
+  {"name":"Suma Special L4L","drops":["3","6","9","12","18","35"],"chlorinated":false},
+  {"name":"Suma Nova L6L","drops":["2","5","7","10","14","29"],"chlorinated":false},
+  {"name":"Suma Nova Pur-Eco L6","drops":["3","6","9","12","18","36"],"chlorinated":false},
+  {"name":"Suma Tera L56","drops":["3","7","10","14","21(5)","42(10)"],"chlorinated":false},
+  {"name":"Suma Combi LA6","drops":["3","5","8","10","16","31"],"chlorinated":false},
+  {"name":"Suma Combi Alu LA10","drops":["2","3","5","7","10","21"],"chlorinated":false},
+  {"name":"Suma Linos L6.8L","drops":["2","4","6","8","13","25"],"chlorinated":false},
+  {"name":"Suma Alu L10","drops":["1","3","4","6","9","18"],"chlorinated":false},
+  {"name":"Suma Med Alu L10","drops":["2","4","5","7","11","22"],"chlorinated":false},
+  {"name":"Suma Jade L8 pur eco","drops":["2","4","5","7","11","22"],"chlorinated":false},
+  {"name":"Sure Machine Detergent","drops":["3","6","9","12","18(5)","36(9)"],"chlorinated":false},
+  {"name":"Suma Polywash Detergent","drops":["3","7","10","14","21(5)","42(10)"],"chlorinated":false},
+  {"name":"Suma Mega L52","drops":["7(2)","14(3)","20(5)","27(7)","10","20"],"chlorinated":false},
+  {"name":"Suma Revoflow Max P1*","drops":["14(3)","27(7)","41(10)","54(14)","20","41"],"chlorinated":true},
+  {"name":"Suma Revoflow Max P2","drops":["14(3)","28(7)","42(10)","56(14)","21","41"],"chlorinated":false},
+  {"name":"Suma Revoflow Max PE 0P P2","drops":["17(4)","33(8)","50(12)","67(16)","25","49"],"chlorinated":false},
+  {"name":"Suma Revoflow Clean P5*","drops":["5","11","16(4)","22(5)","32(8)","16"],"chlorinated":true},
+  {"name":"Suma Revoflow Safe P9*","drops":["3","6","10","13","19(5)","39(10)"],"chlorinated":true},
+  {"name":"Suma Revoflow Safe PE P10","drops":["5","10(2)","14(4)","19(5)","29(7)","57(14)"],"chlorinated":false}
+]
+</script>
 
-    for (let product in products) {
-      const option = document.createElement("option");
-      option.value = product;
-      option.textContent = product;
-      select.appendChild(option);
-    }
+<!-- ─────────────────────────── LOGIC -->
+<script>
+(() => {
+  /* Helpers */
+  const $ = sel => document.querySelector(sel);
+  const parseInts = str => [...str.matchAll(/\d+/g)].map(n=>Number(n));
+  const setHidden = (el,flag) => flag ? el.setAttribute('hidden','') : el.removeAttribute('hidden');
 
-    select.addEventListener("change", function() {
-      const product = this.value;
-      if (!product) return;
+  /* Elements */
+  const filterInput  = $('#filterInput');
+  const selectEl     = $('#productSelect');
+  const tableEl      = $('#resultTable');
+  const warningEl    = $('#chlorinatedWarning');
+  const step2El      = $('#chlorineStep');
+  const instrEl      = $('#instructions');
+  const dropsLabel   = $('#dropsLabel');
+  const dropsInput   = $('#dropsInput');
+  const copyBtn      = $('#copyBtn');
+  const printBtn     = $('#printBtn');
 
-      const drops = products[product];
-      const isChlorinated = product.includes("*");
+  /* Data */
+  const data = JSON.parse($('#detergentData').textContent);
 
-      // Update drop table
-      for (let i = 0; i < drops.length; i++) {
-        document.getElementById("c" + i).textContent = drops[i] || "-";
-      }
-
-      resultTable.style.display = "table";
-      instructions.style.display = "block";
-      chlorinatedWarning.style.display = isChlorinated ? "block" : "none";
-      chlorineStep.style.display = isChlorinated ? "list-item" : "none";
+  /* Build <option>s */
+  function populateSelect(list){
+    selectEl.innerHTML='';
+    list.forEach(({name,chlorinated})=>{
+      const opt=new Option(name,name);
+      opt.dataset.chlorinated=chlorinated;
+      selectEl.add(opt);
     });
-  </script>
+  }
+  populateSelect(data);
+
+  /* Restore last choice */
+  const last = localStorage.getItem('detergent');
+  if(last){
+    selectEl.value=last;
+    selectEl.dispatchEvent(new Event('change'));
+  }
+
+  /* Filter logic */
+  filterInput.addEventListener('input',()=>{
+    const term=filterInput.value.trim().toLowerCase();
+    const filtered = data.filter(d=>d.name.toLowerCase().includes(term));
+    populateSelect(filtered);
+  });
+
+  /* Main change handler */
+  selectEl.addEventListener('change',e=>{
+    const product = data.find(d=>d.name===e.target.value);
+    if(!product) return;
+
+    // update drop table
+    product.drops.forEach((val,i)=>{
+      const cell=$(`#c${i}`);
+      if(!val){cell.textContent='–';return;}
+      if(/\(/.test(val)){
+        const [main,paren]=val.split(/[\(\)]/);
+        cell.innerHTML=`${main}<abbr title="Drops counted with Acid 3">(${paren})</abbr>`;
+      }else{
+        cell.textContent=val;
+      }
+    });
+
+    // UI toggles
+    tableEl.classList.add('fade-in');
+    setTimeout(()=>tableEl.classList.remove('fade-in'),400); // reset
+    [tableEl,instrEl,dropsInput,dropsLabel,copyBtn,printBtn].forEach(el=>setHidden(el,false));
+
+    const isChlor = e.target.selectedOptions[0].dataset.chlorinated==='true';
+    setHidden(warningEl,!isChlor);
+    setHidden(step2El,!isChlor);
+
+    // remember
+    localStorage.setItem('detergent',product.name);
+
+    // clear previous highlights
+    [...selectEl.querySelectorAll('.selected')].forEach(c=>c.classList.remove('selected'));
+    [...tableEl.querySelectorAll('.selected')].forEach(c=>c.classList.remove('selected'));
+  });
+
+  /* Reverse lookup – highlight matching cells */
+  dropsInput.addEventListener('input',()=>{
+    const val=Number(dropsInput.value);
+    if(!val){return;}
+    [...tableEl.querySelectorAll('td')].forEach(td=>td.classList.remove('selected'));
+    [...tableEl.querySelectorAll('#dropRow td:not(:first-child)')].forEach(td=>{
+      const nums=parseInts(td.textContent);
+      if(nums.includes(val)) td.classList.add('selected');
+    });
+  });
+
+  /* Copy results */
+  copyBtn.addEventListener('click',()=>{
+    const product=selectEl.value;
+    const vals=[...tableEl.querySelectorAll('#dropRow td')].slice(1).map(td=>td.innerText).join('\t');
+    navigator.clipboard.writeText(`${product}\t${vals}`);
+    copyBtn.textContent='Copied!';
+    setTimeout(()=>copyBtn.textContent='Copy results to clipboard',1500);
+  });
+
+  /* Print */
+  printBtn.addEventListener('click',()=>window.print());
+
+  /* Minimal PWA (one-file cache) */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      /* manifest as blob */
+      const manifest={
+        name:"Detergent Concentration Tool",
+        short_name:"Detergent",
+        start_url:".",
+        display:"standalone",
+        background_color:getComputedStyle(document.documentElement).getPropertyValue('--brand-blue').trim(),
+        theme_color:getComputedStyle(document.documentElement).getPropertyValue('--brand-blue').trim(),
+        icons:[]
+      };
+      const mURL=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+      document.querySelector('link[rel="manifest"]').href=mURL;
+
+      /* service worker */
+      const swCode=`
+        const CACHE='detergent-tool-v1';
+        self.addEventListener('install',e=>{
+          e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.href])));
+        });
+        self.addEventListener('fetch',e=>{
+          e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+        });
+      `;
+      const swURL=URL.createObjectURL(new Blob([swCode],{type:'application/javascript'}));
+      navigator.serviceWorker.register(swURL);
+    });
+  }
+})();
+</script>
 </body>
 </html>
