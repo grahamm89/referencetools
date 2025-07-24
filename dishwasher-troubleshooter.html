@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dishwasher Troubleshooting Helper</title>
 
 <!-- ────────── COLOURS & RESET ────────── -->
@@ -79,350 +79,13 @@ button:hover{opacity:.9}
 #chemTests li:last-child{border:none}
 #chemTests strong{display:block;margin-bottom:.3rem}
 
-/* Admin reload button (only when ?admin=1) */
-#reloadBtn{
-  position:fixed;bottom:12px;right:12px;z-index:999;
-  background:#444;border-color:#444;width:auto
-}
-
 /* Print tweaks */
 @media print{
-  #copyBtn,#essBar a,#reloadBtn{display:none!important}
+  #copyBtn,#essBar a{display:none!important}
   body{background:#fff}
 }
 </style>
-
-<!-- SheetJS -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-
-<!-- Fallback default config (used if remote Excel is unreachable and there is no cached copy) -->
-<script type="application/json" id="defaultConfig">
-{
-  "symptoms": {
-    "Tannin Stains": {
-      "causes": "Tea, coffee, red-wine tannins adhere—worse where glaze has eroded.",
-      "actions": "Switch to a chlorinated detergent or pre-soak in Suma Shine K2. Renovate with Bactosol where possible."
-    },
-    "Starch": {
-      "causes": "Heated plates, long holds, sticky foods, low detergent or wash pressure/temperature.",
-      "actions": "Increase alkaline detergent, boost temp/pressure, improve pre-scraping."
-    },
-    "Foaming": {
-      "causes": "Low wash/rinse temp, hand-dish liquid in tank, high food load, high tank level, poor rinse.",
-      "actions": "Raise temps, reduce rinse-aid, skim foam, drain & refill, remove high-foam products."
-    },
-    "Drying Marks": {
-      "causes": "Weak rinse, low rinse-aid, hard water, low rinse temperature, poor racking.",
-      "actions": "Repair rinse, dose rinse-aid correctly, soften or de-ionise water, rack items angle-down."
-    },
-    "Detergent Overuse": {
-      "causes": "Broken pump, high set-point, scaled probe, faulty fill valve.",
-      "actions": "Calibrate/repair pump, descale probe, lower set-point, free fill valve."
-    },
-    "Limescale": {
-      "causes": "Hard water with no/failed softener, insufficient detergent, wrong rinse-aid.",
-      "actions": "Regenerate or repair softener, add suitable detergent, use hard-water rinse-aid."
-    },
-    "Cracking Plastic": {
-      "causes": "Excess heat, exposure to hand-dish liquid, aggressive rinse-aid, very high chlorine.",
-      "actions": "Lower rinse temp, remove problem chemicals, use plastic-safe range (A11/A8)."
-    },
-    "Bits After Rinsing": {
-      "causes": "Poor rinse, dirty wash water, coffee grounds/tea bags, poor racking.",
-      "actions": "Service rinse, refresh wash tank, improve pre-scrape, flush rinse supply."
-    },
-    "Detergent Carryover": {
-      "causes": "Poor rinse, high detergent concentration, low rinse pressure.",
-      "actions": "Repair rinse, dial back detergent, clear rinse jets, increase pressure."
-    },
-    "Cloudy Glasses": {
-      "causes": "Hard-water scale, detergent carry-over, too high detergent, high dissolved solids.",
-      "actions": "Soft water or suitable rinse-aid, optimise detergent dose, rinse pressure up."
-    },
-    "Rusty Cutlery": {
-      "causes": "Prolonged soaking, contact with salt or strong chlorine.",
-      "actions": "Shorten soak, rinse quickly, reduce chlorine, upgrade cutlery grade."
-    },
-    "Black SS Cutlery": {
-      "causes": "Contact with silver-dip or excess heat.",
-      "actions": "Keep stainless away from silver cleaner and high heat."
-    },
-    "Silver Tarnishing": {
-      "causes": "Sulphides (eggs/fire), chlorine, heat.",
-      "actions": "Minimise sulphide/chlorine contact, burnish, run lower temps."
-    },
-    "Machine Scaled": {
-      "causes": "Hard-water scale from insufficient detergent in hard areas.",
-      "actions": "Check salt & softener, descale with acid cleaner, ensure detergent dosing."
-    },
-    "Wash Jets Blocked": {
-      "causes": "Debris blocks jets—water can’t reach ware.",
-      "actions": "Remove & clean jets daily, flush thoroughly."
-    }
-  },
-  "checks": [
-    {"key":"dosingOn","text":"Is the dosing equipment switched on?"},
-    {"key":"dosingWorking","text":"Is the dosing equipment working correctly?"},
-    {"key":"temps","text":"Are the temperatures correct?","note":"Pref: 40–55 °C pre-wash · 55–65 °C wash · 80–90 °C rinse · 60–70 °C low-temp"},
-    {"key":"jets","text":"Is the machine working correctly, with all wash and rinse jets clear?"},
-    {"key":"practice","text":"Are staff observing good practice (pre-scraping, racking well)?"},
-    {"key":"detergent","text":"Is the correct detergent used and tubes in the right containers?"},
-    {"key":"titration","text":"Is detergent at the correct strength?"}
-  ],
-  "chemicalTests": [
-    {
-      "title": "Detecting Detergent Carry Over",
-      "html": "Add <em>Indicator Reagent</em> to dishes or glassware. A pink colour indicates alkali—detergent is not being rinsed off.<br><em>Check rinse arms are not blocked and the rinse cycle is functioning.</em>"
-    },
-    {
-      "title": "Detecting Starch",
-      "html": "Add a drop of <em>ACID&nbsp;1</em>, then a drop of <em>Iodide/Iodate</em> to the surface. A blue-black colour reveals starch."
-    },
-    {
-      "title": "Detecting Limescale",
-      "html": "Apply a few drops of <em>ACID&nbsp;3</em> to the suspected area. Bubbling indicates carbonate scale, which the acid will remove."
-    }
-  ]
-}
-</script>
-
-<script defer>
-/* ========= CONFIG SOURCE ========= */
-const REMOTE_XLSX_URL = 'https://solenis-my.sharepoint.com/:x:/r/personal/mgraham_solenis_com/Documents/Apps/ContentController_DishwashTS.xlsx?d=w3f2db155908a4202939c0b6caba4803b&csf=1&web=1&e=euIPbb&download=1'; // <--- paste your direct download URL
-const REMOTE_CACHE_KEY = 'dwRemoteConfig';
-
-/* ========= Utilities ========= */
-const $  = s => document.querySelector(s);
-const ls = {
-  get: k => JSON.parse(localStorage.getItem(k) || 'null'),
-  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
-};
-
-function xlsxToConfig(workbook){
-  const toJSON = (name) =>
-    XLSX.utils.sheet_to_json(workbook.Sheets[name] || {}, { defval: '' });
-
-  const symptoms = {};
-  toJSON('Symptoms').forEach(r => {
-    const key = (r.Symptom || '').trim();
-    if(!key) return;
-    symptoms[key] = { causes: r.Causes || '', actions: r.Actions || '' };
-  });
-
-  const checks = toJSON('Checks').map(r => ({
-    key:  (r.Key  || '').trim(),
-    text: (r.Text || '').trim(),
-    note: (r.Note || '').trim() || undefined
-  })).filter(c => c.key && c.text);
-
-  const chemicalTests = toJSON('ChemicalTests').map(r => ({
-    title: (r.Title || '').trim(),
-    html:  r.HTML || ''
-  })).filter(t => t.title);
-
-  return { symptoms, checks, chemicalTests };
-}
-
-async function fetchRemoteConfig(){
-  const res = await fetch(REMOTE_XLSX_URL, { mode: 'cors', cache: 'no-store' });
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  const buf = await res.arrayBuffer();
-  const wb  = XLSX.read(buf, { type:'array' });
-  return xlsxToConfig(wb);
-}
-
-async function loadConfig(){
-  try{
-    const cfg = await fetchRemoteConfig();
-    localStorage.setItem(REMOTE_CACHE_KEY, JSON.stringify(cfg));
-    return cfg;
-  }catch(err){
-    console.warn('Remote Excel failed, using cached/local config:', err);
-    const cached = JSON.parse(localStorage.getItem(REMOTE_CACHE_KEY) || 'null');
-    if (cached) return cached;
-    const fallback = document.getElementById('defaultConfig');
-    return fallback ? JSON.parse(fallback.textContent) : {};
-  }
-}
-
-/* ========= App state ========= */
-let CONFIG = {};
-let symptomSel, symptomResult, holder, tpl, checklistOut;
-
-/* ========= Rendering ========= */
-function renderSymptomList() {
-  if (!symptomSel) return;
-  const current = symptomSel.value;
-  symptomSel.innerHTML = '<option value="">— choose symptom —</option>' +
-    Object.keys(CONFIG.symptoms || {})
-      .sort()
-      .map(k => `<option value="${k}">${k}</option>`)
-      .join('');
-  if (CONFIG.symptoms && CONFIG.symptoms[current]) symptomSel.value = current;
-}
-function renderSymptom(key){
-  if(!key){
-    symptomResult.classList.remove('show');
-    symptomResult.innerHTML = '';
-    return;
-  }
-  const d = CONFIG.symptoms[key];
-  if(!d){
-    symptomResult.innerHTML='<em>No data found</em>';
-    symptomResult.classList.add('show');
-    return;
-  }
-  symptomResult.innerHTML = `
-    <p><strong>Likely causes:</strong> ${d.causes}</p>
-    <p><strong>Suggested actions:</strong> ${d.actions}</p>`;
-  symptomResult.classList.add('show');
-  symptomResult.scrollIntoView({behavior:'smooth',block:'start'});
-  ls.set('lastSymptom',key);
-}
-
-function renderChecks() {
-  if (!tpl || !holder) return;
-  holder.innerHTML = '';
-  (CONFIG.checks || []).forEach((q,i)=>{
-    const node = document.importNode(tpl,true);
-    node.querySelector('p').textContent = `${i+1}. ${q.text}`;
-
-    const inputs = node.querySelectorAll('input');
-    const yes = inputs[0], no = inputs[1];
-    const yesLbl = node.querySelector('.yes');
-    const noLbl  = node.querySelector('.no');
-
-    yes.id = `${q.key}Y`; no.id = `${q.key}N`;
-    yes.name = no.name = q.key;
-    yes.value = 'Yes'; no.value = 'No';
-
-    yesLbl.setAttribute('for', yes.id);
-    noLbl.setAttribute('for',  no.id);
-
-    const saved = ls.get('toggle_'+q.key) || 'Yes';
-    (saved === 'No' ? no : yes).checked = true;
-
-    const note = node.querySelector('.note');
-    if (q.note) {
-      note.textContent = q.note;
-      note.hidden = false;
-    }
-
-    holder.appendChild(node);
-  });
-  compileAdvice();
-}
-
-function renderChemTests(){
-  const ul = document.querySelector('#chemTests ul');
-  if(!ul) return;
-  ul.innerHTML = (CONFIG.chemicalTests || []).map(t => `
-    <li>
-      <strong>${t.title}:</strong><br>
-      ${t.html}
-    </li>
-  `).join('');
-}
-
-function val(name){ return document.querySelector(`input[name="${name}"]:checked`)?.value || ''; }
-
-function compileAdvice(){
-  const msgs=[];
-  if(val('dosingOn')==='No')       msgs.push('Switch on dosing unit.');
-  if(val('dosingWorking')==='No')  msgs.push('Repair or calibrate dosing equipment.');
-  if(val('temps')==='No')          msgs.push('Verify and adjust wash & rinse temperatures.');
-  if(val('jets')==='No')           msgs.push('Clear wash and rinse jets.');
-  if(val('practice')==='No')       msgs.push('Improve pre-scraping and racking practices.');
-  if(val('detergent')==='No')      msgs.push('Connect correct detergent containers & tubing.');
-  if(val('titration')==='No')      msgs.push('Perform detergent titration test.');
-
-  checklistOut.innerHTML = msgs.length ?
-    `<h3>Checklist findings</h3><ul><li>${msgs.join('</li><li>')}</li></ul>` :
-    `<p>No obvious issues from the checklist.</p>`;
-  checklistOut.classList.add('show');
-}
-
-function rerender(){
-  renderSymptomList();
-  renderChecks();
-  renderChemTests();
-  symptomResult.classList.remove('show');
-}
-
-/* ========= Boot ========= */
-document.addEventListener('DOMContentLoaded', async () => {
-  symptomSel    = $('#symptom');
-  symptomResult = $('#symptomResult');
-  holder        = $('#toggleHolder');
-  tpl           = $('#toggleTemplate')?.content;
-  checklistOut  = $('#checklistResult');
-
-  // remember make/model
-  ['mMake','mModel'].forEach(id=>{
-    const el=$( '#' + id);
-    el.value = ls.get(id) || '';
-    el.addEventListener('input',()=>ls.set(id,el.value.trim()));
-  });
-
-  // handlers
-  symptomSel?.addEventListener('change',e=>renderSymptom(e.target.value));
-  holder?.addEventListener('change',e=>{
-    if(e.target.matches('input[type="radio"]')){
-      ls.set('toggle_'+e.target.name,e.target.value);
-      compileAdvice();
-    }
-  });
-
-  // copy summary
-  $('#copyBtn')?.addEventListener('click',()=>{
-    let txt = `Machine Make: ${$('#mMake').value || '-'}\n`;
-    txt    += `Machine Model: ${$('#mModel').value || '-'}\n\n`;
-    (CONFIG.checks || []).forEach((q,i)=>{
-      const ans = val(q.key) || '-';
-      txt += `${i+1}. ${q.text} - ${ans}\n`;
-    });
-    txt += '\n--- Symptom ---\n';
-    txt += symptomSel.value ? `${symptomSel.value}\n` : 'None selected\n';
-    txt += symptomResult.textContent.trim() ? '\n' + symptomResult.textContent.trim() : '';
-    (navigator.clipboard?.writeText(txt) || Promise.reject()).then(()=>{
-      alert('Summary copied to clipboard!');
-    }).catch(()=>{
-      const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      alert('Summary copied!');
-    });
-  });
-
-  CONFIG = await loadConfig();
-
-  rerender();
-
-  const lastSym = ls.get('lastSymptom');
-  if(lastSym && CONFIG.symptoms && CONFIG.symptoms[lastSym]){
-    symptomSel.value = lastSym;
-    renderSymptom(lastSym);
-  }
-
-  // Show a reload button if ?admin=1
-  if (new URL(location.href).searchParams.get('admin') === '1') {
-    const btn = document.createElement('button');
-    btn.id = 'reloadBtn';
-    btn.textContent = 'Reload remote Excel';
-    btn.addEventListener('click', async () => {
-      try{
-        const fresh = await fetchRemoteConfig();
-        localStorage.setItem(REMOTE_CACHE_KEY, JSON.stringify(fresh));
-        CONFIG = fresh;
-        rerender();
-        alert('Reloaded from remote Excel');
-      }catch(e){
-        alert('Failed to reload: ' + e.message);
-      }
-    });
-    document.body.appendChild(btn);
-  }
-});
-</script>
+<link rel="manifest"><!-- href injected at runtime -->
 </head>
 <body>
 
@@ -445,6 +108,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   <label for="symptom">Observed symptom or issue:</label>
   <select id="symptom">
     <option value="">— choose symptom —</option>
+    <option value="Tannin Stains">Tannin stains (tea / coffee / wine)</option>
+    <option value="Starch">Starch residue</option>
+    <option value="Foaming">Excessive foaming</option>
+    <option value="Drying Marks">Drying marks / streaking</option>
+    <option value="Detergent Overuse">Detergent over-use</option>
+    <option value="Limescale">Limescale forming</option>
+    <option value="Cracking Plastic">Cracking plastic-ware</option>
+    <option value="Bits After Rinsing">Bits left after rinsing</option>
+    <option value="Detergent Carryover">Detergent carry-over</option>
+    <option value="Cloudy Glasses">Cloudy glasses</option>
+    <option value="Rusty Cutlery">Rusty cutlery</option>
+    <option value="Black SS Cutlery">Black stainless-steel cutlery</option>
+    <option value="Silver Tarnishing">Silver tarnishing</option>
+    <option value="Machine Scaled">Machine scaled</option>
+    <option value="Wash Jets Blocked">Wash jets blocked</option>
   </select>
   <div id="symptomResult" class="result"></div>
 </section>
@@ -480,8 +158,236 @@ document.addEventListener('DOMContentLoaded', async () => {
 <!-- ======== 3. Chemical Tests ======== -->
 <section id="chemTests">
   <h2>3. Chemical Tests</h2>
-  <ul></ul>
+  <ul>
+    <li>
+      <strong>Detecting Detergent Carry Over:</strong><br>
+      Add <em>Indicator Reagent</em> to dishes or glassware. A pink colour indicates alkali—detergent is not being rinsed off.<br>
+      <em>Check rinse arms are not blocked and the rinse cycle is functioning.</em>
+    </li>
+    <li>
+      <strong>Detecting Starch:</strong><br>
+      Add a drop of <em>ACID&nbsp;1</em>, then a drop of <em>Iodide/Iodate</em> to the surface. A blue-black colour reveals starch.
+    </li>
+    <li>
+      <strong>Detecting Limescale:</strong><br>
+      Apply a few drops of <em>ACID&nbsp;3</em> to the suspected area. Bubbling indicates carbonate scale, which the acid will remove.
+    </li>
+  </ul>
 </section>
 
+<!-- ────────── SCRIPT ────────── -->
+<script type="application/json" id="symptomData">
+{
+ "Tannin Stains":{
+   "causes":"Tea, coffee, red-wine tannins adhere—worse where glaze has eroded.",
+   "actions":"Switch to a chlorinated detergent or pre-soak in Suma Shine K2. Renovate with Bactosol where possible."
+ },
+ "Starch":{
+   "causes":"Heated plates, long holds, sticky foods, low detergent or wash pressure/temperature.",
+   "actions":"Increase alkaline detergent, boost temp/pressure, improve pre-scraping."
+ },
+ "Foaming":{
+   "causes":"Low wash/rinse temp, hand-dish liquid in tank, high food load, high tank level, poor rinse.",
+   "actions":"Raise temps, reduce rinse-aid, skim foam, drain & refill, remove high-foam products."
+ },
+ "Drying Marks":{
+   "causes":"Weak rinse, low rinse-aid, hard water, low rinse temperature, poor racking.",
+   "actions":"Repair rinse, dose rinse-aid correctly, soften or de-ionise water, rack items angle-down."
+ },
+ "Detergent Overuse":{
+   "causes":"Broken pump, high set-point, scaled probe, faulty fill valve.",
+   "actions":"Calibrate/repair pump, descale probe, lower set-point, free fill valve."
+ },
+ "Limescale":{
+   "causes":"Hard water with no/failed softener, insufficient detergent, wrong rinse-aid.",
+   "actions":"Regenerate or repair softener, add suitable detergent, use hard-water rinse-aid."
+ },
+ "Cracking Plastic":{
+   "causes":"Excess heat, exposure to hand-dish liquid, aggressive rinse-aid, very high chlorine.",
+   "actions":"Lower rinse temp, remove problem chemicals, use plastic-safe range (A11/A8)."
+ },
+ "Bits After Rinsing":{
+   "causes":"Poor rinse, dirty wash water, coffee grounds/tea bags, poor racking.",
+   "actions":"Service rinse, refresh wash tank, improve pre-scrape, flush rinse supply."
+ },
+ "Detergent Carryover":{
+   "causes":"Poor rinse, high detergent concentration, low rinse pressure.",
+   "actions":"Repair rinse, dial back detergent, clear rinse jets, increase pressure."
+ },
+ "Cloudy Glasses":{
+   "causes":"Hard-water scale, detergent carry-over, too high detergent, high dissolved solids.",
+   "actions":"Soft water or suitable rinse-aid, optimise detergent dose, rinse pressure up."
+ },
+ "Rusty Cutlery":{
+   "causes":"Prolonged soaking, contact with salt or strong chlorine.",
+   "actions":"Shorten soak, rinse quickly, reduce chlorine, upgrade cutlery grade."
+ },
+ "Black SS Cutlery":{
+   "causes":"Contact with silver-dip or excess heat.",
+   "actions":"Keep stainless away from silver cleaner and high heat."
+ },
+ "Silver Tarnishing":{
+   "causes":"Sulphides (eggs/fire), chlorine, heat.",
+   "actions":"Minimise sulphide/chlorine contact, burnish, run lower temps."
+ },
+ "Machine Scaled":{
+   "causes":"Hard-water scale from insufficient detergent in hard areas.",
+   "actions":"Check salt & softener, descale with acid cleaner, ensure detergent dosing."
+ },
+ "Wash Jets Blocked":{
+   "causes":"Debris blocks jets—water can’t reach ware.",
+   "actions":"Remove & clean jets daily, flush thoroughly."
+ }
+}
+</script>
+
+<script>
+(() => {
+  /* ── helpers ─────────────────────────────────────── */
+  const $ = sel => document.querySelector(sel);
+  const setHidden = (el,flag) => flag ? el.setAttribute('hidden','') : el.removeAttribute('hidden');
+  const ls = {
+    get: key => JSON.parse(localStorage.getItem(key) || 'null'),
+    set: (key,val) => localStorage.setItem(key,JSON.stringify(val))
+  };
+
+  /* ── symptom lookup ─────────────────────────────── */
+  const SYMPTOMS = JSON.parse($('#symptomData').textContent);
+  const symptomSel = $('#symptom');
+  const symptomResult = $('#symptomResult');
+
+  function renderSymptom(key){
+    if(!key){ symptomResult.classList.remove('show'); symptomResult.innerHTML=''; return; }
+    const d = SYMPTOMS[key];
+    if(!d){ symptomResult.innerHTML='<em>No data found</em>'; symptomResult.classList.add('show'); return; }
+    symptomResult.innerHTML = `
+      <p><strong>Likely causes:</strong> ${d.causes}</p>
+      <p><strong>Suggested actions:</strong> ${d.actions}</p>`;
+    symptomResult.classList.add('show');
+    symptomResult.scrollIntoView({behavior:'smooth',block:'start'});
+    ls.set('lastSymptom',key);
+  }
+
+  symptomSel.addEventListener('change',e=>renderSymptom(e.target.value));
+  /* restore last symptom */
+  const lastSym = ls.get('lastSymptom');
+  if(lastSym && SYMPTOMS[lastSym]){ symptomSel.value = lastSym; renderSymptom(lastSym); }
+
+  /* ── toggle checklist build ─────────────────────── */
+  const QUESTIONS = [
+    {key:'dosingOn',     text:'Is the dosing equipment switched on?'},
+    {key:'dosingWorking',text:'Is the dosing equipment working correctly?'},
+    {key:'temps',        text:'Are the temperatures correct?', note:'Pref: 40–55 °C pre-wash · 55–65 °C wash · 80–90 °C rinse · 60–70 °C low-temp'},
+    {key:'jets',         text:'Is the machine working correctly, with all wash and rinse jets clear?'},
+    {key:'practice',     text:'Are staff observing good practice (pre-scraping, racking well)?'},
+    {key:'detergent',    text:'Is the correct detergent used and tubes in the right containers?'},
+    {key:'titration',    text:'Is detergent at the correct strength?'}
+  ];
+
+  const holder = $('#toggleHolder');
+  const tpl = $('#toggleTemplate').content;
+
+  QUESTIONS.forEach((q,i)=>{
+    const node = document.importNode(tpl,true);
+    const p   = node.querySelector('p'); p.textContent = `${i+1}. ${q.text}`;
+    const yes = node.querySelector('.yes'); const no  = node.querySelector('.no');
+    const yIn = node.querySelectorAll('input')[0]; const nIn = node.querySelectorAll('input')[1];
+    yIn.id = `${q.key}Y`; nIn.id = `${q.key}N`;
+    yIn.name = nIn.name = q.key;
+    yIn.value='Yes'; nIn.value='No';
+    yes.setAttribute('for',yIn.id); no.setAttribute('for',nIn.id);
+    if(q.note){
+      const note = node.querySelector('.note');
+      note.textContent = q.note;
+      setHidden(note,false);
+    }
+    /* restore saved choice */
+    const saved = ls.get('toggle_'+q.key) || 'Yes';
+    if(saved==='No'){ nIn.checked=true; } else { yIn.checked=true; }
+    holder.appendChild(node);
+  });
+
+  /* ── live advice ────────────────────────────────── */
+  const checklistOut = $('#checklistResult');
+  function val(name){ return document.querySelector(`input[name="${name}"]:checked`)?.value || ''; }
+
+  function compileAdvice(){
+    const msgs=[];
+    if(val('dosingOn')==='No')       msgs.push('Switch on dosing unit.');
+    if(val('dosingWorking')==='No')  msgs.push('Repair or calibrate dosing equipment.');
+    if(val('temps')==='No')          msgs.push('Verify and adjust wash & rinse temperatures.');
+    if(val('jets')==='No')           msgs.push('Clear wash and rinse jets.');
+    if(val('practice')==='No')       msgs.push('Improve pre-scraping and racking practices.');
+    if(val('detergent')==='No')      msgs.push('Connect correct detergent containers & tubing.');
+    if(val('titration')==='No')      msgs.push('Perform detergent titration test.');
+
+    checklistOut.innerHTML = msgs.length ?
+      `<h3>Checklist findings</h3><ul><li>${msgs.join('</li><li>')}</li></ul>` :
+      `<p>No obvious issues from the checklist.</p>`;
+    checklistOut.classList.add('show');
+  }
+  compileAdvice();
+
+  holder.addEventListener('change',e=>{
+    if(e.target.matches('input[type="radio"]')){
+      ls.set('toggle_'+e.target.name,e.target.value);
+      compileAdvice();
+    }
+  });
+
+  /* ── copy summary ──────────────────────────────── */
+  $('#copyBtn').addEventListener('click',()=>{
+    let txt = `Machine Make: ${$('#mMake').value || '-'}\n`;
+    txt    += `Machine Model: ${$('#mModel').value || '-'}\n\n`;
+    QUESTIONS.forEach((q,i)=>{
+      txt += `${i+1}. ${q.text} - ${val(q.key)}\n`;
+    });
+    txt += '\n--- Symptom ---\n';
+    txt += symptomSel.value ? `${symptomSel.value}\n` : 'None selected\n';
+    txt += symptomResult.textContent.trim() ? '\n' + symptomResult.textContent.trim() : '';
+    (navigator.clipboard?.writeText(txt) || Promise.reject()).then(()=>{
+      alert('Summary copied to clipboard!');
+    }).catch(()=>{
+      const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      alert('Summary copied!');
+    });
+  });
+
+  /* ── remember make/model ───────────────────────── */
+  ['mMake','mModel'].forEach(id=>{
+    const el=$( '#' + id);
+    el.value = ls.get(id) || '';
+    el.addEventListener('input',()=>ls.set(id,el.value.trim()));
+  });
+
+  /* ── PWA (optional, auto-installs) ─────────────── */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      /* manifest on the fly */
+      const manifest = {
+        name:'Dishwasher Helper',
+        short_name:'DW Helper',
+        start_url:'.',
+        display:'standalone',
+        background_color:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+        theme_color:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+        icons:[]
+      };
+      const mURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+      document.querySelector('link[rel="manifest"]').href = mURL;
+
+      /* service worker */
+      const swCode = `
+        const CACHE='dw-helper-v1';
+        self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.href]))));
+        self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+      `;
+      const swURL = URL.createObjectURL(new Blob([swCode],{type:'application/javascript'}));
+      navigator.serviceWorker.register(swURL);
+    });
+  }
+})();
+</script>
 </body>
 </html>
