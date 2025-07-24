@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Detergent Concentration Tool</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="main.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#004085">
+</head>
+<body>
+<main>
+  <h1>Detergent Concentration Tool</h1>
+
+  <label for="filterInput"><strong>Type to filter products:</strong></label>
+  <input id="filterInput" type="search" placeholder="Start typing… e.g. Suma" autocomplete="off" aria-label="Filter products">
+
+  <label for="productSelect"><strong>Select a product:</strong></label>
+  <select id="productSelect" size="8" aria-describedby="chlorinatedWarning"></select>
+
+  <div id="chlorinatedWarning" class="chlorinated p-2" role="alert" hidden>
+    <strong>Note:</strong> This is a <strong>chlorinated product</strong>. Add 3 drops of <strong>Sodium Thiosulphate</strong> in Step&nbsp;2.
+  </div>
+
+  <div class="table-scroll">
+    <table id="resultTable" hidden>
+      <thead><tr id="headRow"></tr></thead>
+      <tbody>
+        <tr id="dropRow"><td>Drops</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <label for="dropsInput" hidden id="dropsLabel"><strong>Reverse lookup – enter drop count:</strong></label>
+  <div class="reverse">
+    <input type="number" id="dropsInput" min="1" placeholder="e.g. 7" hidden>
+    <button id="resetBtn" hidden aria-label="Clear reverse look-up">✖︎</button>
+  </div>
+
+  <div class="instructions p-2" id="instructions" hidden>
+    <h3>Instructions</h3>
+    <ol>
+      <li>Fill the test tube to the 5&nbsp;ml mark with water from the wash tank.</li>
+      <li id="chlorineStep" hidden>Add 3 drops of Sodium&nbsp;Thiosulphate.</li>
+      <li>Add 1 drop of Indicator Reagent — solution will turn pink.</li>
+      <li>Select the correct acid by reference to table&nbsp;3 (ACID&nbsp;3 is 4 × strength of ACID&nbsp;1).</li>
+      <li>Add the ACID&nbsp;1 or&nbsp;3 a drop at a time, holding dropper bottle vertically. Swirl after each addition.</li>
+      <li>Continue until the colour changes from pink to colourless.</li>
+      <li>Count the drops and read concentration from table&nbsp;2.</li>
+    </ol>
+  </div>
+
+  <button id="copyBtn" hidden>Copy results to clipboard</button>
+  <button id="printBtn" hidden>Print instructions</button>
+</main>
+
+<script src="main.js" defer></script>
+</body>
+</html>
