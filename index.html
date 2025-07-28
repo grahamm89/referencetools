@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>QFM Peg Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest"><!-- href injected at runtime -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -166,6 +167,35 @@
     }
 
     window.onload = init;
+  </script>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load',()=>{
+        const manifest={
+          name:'Dilution Calculator',
+          short_name:'Dilution',
+          start_url:'.',
+          display:'standalone',
+          background_color:'#f0f0f0',
+          theme_color:'#4CAF50',
+          icons:[]
+        };
+        const mURL=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
+        document.querySelector('link[rel="manifest"]').href=mURL;
+
+        const swCode=`
+          const CACHE='dilution-tool-v1';
+          self.addEventListener('install',e=>{
+            e.waitUntil(caches.open(CACHE).then(c=>c.addAll([location.href])));
+          });
+          self.addEventListener('fetch',e=>{
+            e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+          });
+        `;
+        const swURL=URL.createObjectURL(new Blob([swCode],{type:'application/javascript'}));
+        navigator.serviceWorker.register(swURL);
+      });
+    }
   </script>
 </body>
 </html>
