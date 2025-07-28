@@ -483,14 +483,14 @@ async function loadCustomers(){
 
   // otherwise geocode once
   const list=[];
-  for(let i=0;i<baseCustomers.length;i++){
-    bar("progress").textContent=`Geocoding ${i+1}/${baseCustomers.length}`;
-    const c=baseCustomers[i];
-    try{ 
-      const [lat,lon]=await getLatLon(c.pc);
+  for(let i=0;i<customers.length;i++){
+    bar("progress").textContent=`Geocoding ${i+1}/${customers.length}`;
+    const c=customers[i];
+    try{
+      const [lat,lon]=await getLatLon(c.postcode);
       list.push({...c,lat,lon});
     }catch{ /* skip bad pc */ }
-    if(i<baseCustomers.length-1) await sleep(1300); // polite throttle
+    if(i<customers.length-1) await sleep(1300); // polite throttle
   }
   localStorage.setItem("custCoords_v1",JSON.stringify(list));
   bar("progress").textContent="";
@@ -522,7 +522,7 @@ async function run(){
     bar("results").innerHTML = rows.slice(0,5).map(c=>`
       <div class="customer">
         <strong>${c.name}</strong><br>
-        ${c.pc}<br>
+        ${c.postcode}<br>
         Drive time: ${c.mins.toFixed(1)} min
       </div>`).join("");
   }catch(e){
